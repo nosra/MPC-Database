@@ -4,13 +4,31 @@
 <head>
     {% tailwind_css %}
 </head>
-<body>
-    <div class="navbar flex flex-row items-center gap-4">
-        <h1 class="text-3xl text-fuchsia-500">Home Page</h1>
-
-        <div class="w-30 h-30">
-            <img src="{% static 'homepage/mpc-logo.svg' %}"
-                alt="MPC logo">
+<body class="h-screen w-screen bg-linear-to-r from-blue-950 to-blue-800">
+    <!--navbar-->
+    <div class="pl-20 navbar flex flex-row items-center gap-20">
+        <div class="mpc-logo w-20 h-20 object-contain scale-300">
+            <img src="{% static 'homepage/mpc-logo.svg' %}" alt="MPC logo">
+        </div>
+        <div class="about">
+            <label class="font-light text-xl">
+                About
+            </label>
+        </div>
+        <div class="plugins">
+            <label class="font-light text-xl">
+                Plugins
+            </label>
+        </div>
+        <div class="plugins">
+            <label class="font-light text-xl">
+                Tutorials
+            </label>
+        </div>
+        <div class="plugins">
+            <label class="font-light text-xl">
+                Submissions
+            </label>
         </div>
     </div>
 
