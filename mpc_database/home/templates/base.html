@@ -4,35 +4,54 @@
 <head>
     {% tailwind_css %}
 </head>
-<body class="h-screen w-screen bg-linear-to-r from-blue-950 to-blue-800">
+<body class="min-h-screen w-screen flex flex-col bg-linear-60 from-[#00163C] to-[#004F99]">
     <!--navbar-->
     <div class="pl-20 navbar flex flex-row items-center gap-20">
         <div class="mpc-logo w-20 h-20 object-contain scale-300">
             <img src="{% static 'homepage/mpc-logo.svg' %}" alt="MPC logo">
         </div>
-        <div class="about">
-            <label class="font-light text-xl">
-                About
+        <div class="ml-20 navbutton transition duration-200 hover:text-[#FFB81C]">
+            <label class="text-xl animated-underline">
+            About
             </label>
         </div>
-        <div class="plugins">
-            <label class="font-light text-xl">
+        <div class="navbutton transition duration-200 hover:text-[#FFB81C]">
+            <label class="text-xl animated-underline">
                 Plugins
             </label>
         </div>
-        <div class="plugins">
-            <label class="font-light text-xl">
+        <div class="navbutton transition duration-200 hover:text-[#FFB81C]">
+            <label class="text-xl animated-underline">
                 Tutorials
             </label>
         </div>
-        <div class="plugins">
-            <label class="font-light text-xl">
+        <div class="navbutton transition duration-200 hover:text-[#FFB81C]">
+            <label class="text-xl animated-underline">
                 Submissions
             </label>
         </div>
     </div>
-
+    <main class="grow">
     {% block content %}
     {% endblock %}
+    </main>
+    <!-- footer, this has the logo and links to socials -->
+    <footer class="w-full p-8"> <div class="container mx-auto flex flex-col md:flex-row items-center gap-10 text-gray-300">
+            <div class="text-center md:text-left mb-4 md:mb-0">
+                <p class="font-bold">&copy; 2025 Pitt MPC</p>
+                <p class="text-sm">University of Pittsburgh</p>
+            </div>
+
+            <div class="flex gap-8">
+                <a href="#" class="w-10 h-10">
+                    <img src="{% static 'homepage/discord-logo.svg' %}"/>
+                </a>
+                <a href="#" class="w-10 h-10">
+                    <img src="{% static 'homepage/instagram-logo.svg' %}"/>
+                </a>
+            </div>
+
+        </div>
+    </footer>
 </body>
 </html>

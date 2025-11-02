@@ -9,3 +9,28 @@
   * the scope of this path.
   */
 @source "../../../**/*.{html,py,js}";
+
+/* custom animations, since tailwind doesn't support fade-ins on page start */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@layer utilities {
+  .animate-fade-in-slow {
+    animation: fadeIn 1.5s ease-in-out forwards;
+  }
+}
+
+/* custom classes */
+@layer components {
+  .animated-underline {
+    @apply inline-block cursor-pointer bg-[linear-gradient(currentColor,currentColor)] bg-[position:0_100%] bg-no-repeat bg-[length:0%_2px] transition-[background-size] duration-300 ease-in-out hover:bg-[length:100%_2px];
+  }
+}
