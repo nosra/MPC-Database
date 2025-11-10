@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="window flex h-svh w-wvh bg-[#00163C] border-t-2 border-b-2 border-[#004F99]">
+    <div class="plugin overflow-auto ml-10 mt-10">
+        <div class="plugin__categories flex flex-col w-full h-1/2 bg-[#022157] gap-5 p-5 rounded-2xl">
+            <label class="font-bold">
+                Categories
+            </label>
+            <label class=" ml-5 category">
+                Synths
+            </label>
+            <label class=" ml-5 category">
+                Effects
+            </label>
+        </div>
+    </div>
+</div>
+{% endblock %}
