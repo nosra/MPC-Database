@@ -4,11 +4,11 @@
 <head>
     {% tailwind_css %}
 </head>
-<body class="min-h-screen w-screen flex flex-col bg-linear-60 from-[#00163C] to-[#004F99]">
+<body class="min-h-dvh w-full flex flex-col bg-linear-60 from-[#00163C] to-[#004F99]">
     <!--navbar-->
     <div class="pl-20 pb-5 navbar flex flex-row items-center gap-20">
         <a href="{% url 'home' %}" class="mpc-logo inline-block">
-            <img class="h-20 w-20 object-contain hover:scale-105 transition-transform duration-200"
+            <img class="w-[5vw] h-auto object-contain hover:scale-105 transition-transform duration-200"
                 src="{% static 'homepage/mpc-logo.svg' %}" alt="MPC logo">
         </a>
         <a class="ml-20 navbutton transition duration-200 hover:text-[#FFB81C]">
