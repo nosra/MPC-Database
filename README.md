@@ -17,7 +17,13 @@ source venv/bin/activate
 ```
 pip install -r requirements.txt
 ```
-## 4. Start the dev environment
+
+## 4. Install TailwindCSS Dependencies
+```
+# within the mpc_database root
+python manage.py tailwind install
+```
+## 5. Start the dev environment
 ```
 # within the mpc_database root
 python manage.py tailwind dev
