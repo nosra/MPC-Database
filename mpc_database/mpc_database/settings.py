@@ -138,3 +138,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # npm
 NPM_BIN_PATH = r"C:\Program Files\nodejs\npm.cmd"
+
+AUTH_USER_MODEL = "home.CustomUser"
