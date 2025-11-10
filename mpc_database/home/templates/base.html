@@ -6,30 +6,31 @@
 </head>
 <body class="min-h-screen w-screen flex flex-col bg-linear-60 from-[#00163C] to-[#004F99]">
     <!--navbar-->
-    <div class="pl-20 navbar flex flex-row items-center gap-20">
-        <div class="mpc-logo w-20 h-20 object-contain scale-300">
-            <img src="{% static 'homepage/mpc-logo.svg' %}" alt="MPC logo">
-        </div>
-        <div class="ml-20 navbutton transition duration-200 hover:text-[#FFB81C]">
+    <div class="pl-20 pb-5 navbar flex flex-row items-center gap-20">
+        <a href="{% url 'home' %}" class="mpc-logo w-20 h-20 object-contain scale-300">
+            <img class="hover:scale-80 duration-100" src="{% static 'homepage/mpc-logo.svg' %}" alt="MPC logo">
+        </a>
+        <a class="ml-20 navbutton transition duration-200 hover:text-[#FFB81C]">
             <label class="text-xl animated-underline">
             About
             </label>
-        </div>
-        <div class="navbutton transition duration-200 hover:text-[#FFB81C]">
+        </a>
+        <!-- this is how to move from page to page -->
+        <a href="{% url 'plugins' %}" class="navbutton transition duration-200 hover:text-[#FFB81C]">
             <label class="text-xl animated-underline">
                 Plugins
             </label>
-        </div>
-        <div class="navbutton transition duration-200 hover:text-[#FFB81C]">
+        </a>
+        <a class="navbutton transition duration-200 hover:text-[#FFB81C]">
             <label class="text-xl animated-underline">
                 Tutorials
             </label>
-        </div>
-        <div class="navbutton transition duration-200 hover:text-[#FFB81C]">
+        </a>
+        <a class="navbutton transition duration-200 hover:text-[#FFB81C]">
             <label class="text-xl animated-underline">
                 Submissions
             </label>
-        </div>
+        </a>
     </div>
     <main class="grow">
     {% block content %}
