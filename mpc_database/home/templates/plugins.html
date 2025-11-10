@@ -4,17 +4,35 @@
 
 {% block content %}
 <div class="window flex h-svh w-wvh bg-[#00163C] border-t-2 border-b-2 border-[#004F99]">
-    <div class="plugin overflow-auto ml-10 mt-10">
-        <div class="plugin__categories flex flex-col w-full h-1/2 bg-[#022157] gap-5 p-5 rounded-2xl">
-            <label class="font-bold">
+    <div class="plugin overflow-auto">
+        <div class="plugin__categories flex flex-col text-left w-full h-full bg-[#022157] border-[#004F99] pl-10 pr-10 pt-5 gap-3 border-r-2 border-b-2">
+            <label class="category__title font-bold text-center">
                 Categories
             </label>
-            <label class=" ml-5 category">
-                Synths
-            </label>
-            <label class=" ml-5 category">
-                Effects
-            </label>
+            <div class="category__pill flex flex-row gap-2 items-center rounded-2xl p-2 hover:bg-[#004F99] transition-colors duration-200">
+                <img class="size-7" src="{% static 'plugins/effects.svg' %}"/>
+                <label class="category">
+                    Effects
+                </label>
+            </div>
+            <div class="category__pill flex flex-row gap-2 items-center rounded-2xl p-2 hover:bg-[#004F99] transition-colors duration-200">
+                <img class="size-7" src="{% static 'plugins/synth.svg' %}"/>
+                <label class="category">
+                    Synths
+                </label>
+            </div>
+            <div class="category__pill flex flex-row gap-2 items-center rounded-2xl p-2 hover:bg-[#004F99] transition-colors duration-200">
+                <img class="size-7" src="{% static 'plugins/compress.svg' %}"/>
+                <label class="category">
+                    Compressors
+                </label>
+            </div>
+            <div class="category__pill flex flex-row gap-2 items-center rounded-2xl p-2 hover:bg-[#004F99] transition-colors duration-200">
+                <img class="size-7" src="{% static 'plugins/distort.svg' %}"/>
+                <label class="category">
+                    Distorters
+                </label>
+            </div>
         </div>
     </div>
 </div>
