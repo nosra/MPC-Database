@@ -39,15 +39,183 @@
                     Distorters
                 </label>
             </div>
-        </div>
-    </div>
-    <div class="plugin__view grow bg-white rounded-3xl mr-12">
-        <!-- navbar -->
-        <div class="plugin__navbar flex flex-col items-center justify-center pt-2 pl-10 text-white border-[#004F99] pb-2">
-            <div class="title text-3xl text-black font-normal">
-                <label>Effects</label>
+            <div class="category__pill flex flex-row gap-2 items-center rounded-4xl p-2 hover:bg-[#004F99] transition-colors duration-200">
+                <img class="size-7" src="{% static 'plugins/mixer.svg' %}"/>
+                <label class="category">
+                    DAW
+                </label>
             </div>
         </div>
     </div>
+    <div class="plugin__view grow bg-white rounded-3xl mr-12">
+        <!-- search bar -->
+        <div class="plugin__navbar flex flex-col items-center justify-center pt-4 pb-4 px-10">
+            <!-- slick search input -->
+            <div class="w-full max-w-md relative">
+                <input
+                    type="text"
+                    placeholder="Search plugins..."
+                    class="w-full rounded-2xl bg-gray-100 pl-12 pr-4 py-2
+                        text-gray-800 placeholder-gray-400
+                        shadow-sm border border-gray-200
+                        focus:outline-none focus:ring-2 focus:ring-[#004F99] focus:border-transparent
+                        transition duration-200"
+                />
+
+                <!-- icon -->
+                <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500"
+                    fill="none" stroke="currentColor" stroke-width="2"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1010.5 18a7.5 7.5 0 006.15-3.35z"/>
+                </svg>
+            </div>
+        </div>
+        <!-- this will be where the plugins are -->
+        <!-- fabfilter example -->
+        <div class="plugin__plugins flex flex-row">
+            <div class="plugin_element flex flex-col p-5">
+                <div class="relative w-64 aspect-square overflow-hidden rounded-xl drop-shadow-xl/50">
+
+                    <!-- bg image -->
+                    <img 
+                        src="{% static 'plugins/pro-q-3-intro.jpg' %}" 
+                        class="absolute inset-0 w-full h-full object-cover"
+                        alt=""
+                    />
+
+                    <!-- pro/alt label -->
+                    <div class="relative t-40 l-40 w-20 p-2">
+                        <div class="bg-[#004F99] rounded-2xl flex justify-center">
+                            <label class="font-bold">
+                                PRO
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- bottom blurred info panel -->
+                    <div class="absolute bottom-0 w-full h-1/3 
+                                bg-black/40 backdrop-blur-sm 
+                                flex flex-col p-4 text-white">
+
+                        <label class="text-sm text-gray-200">
+                            Effect, Compressor
+                        </label>
+
+                        <label class="text-lg font-semibold mt-1">
+                            FabFilter Pro-Q 3
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <!-- synth example -->
+            <div class="plugin_element flex flex-col p-5">
+                <div class="relative w-64 aspect-square overflow-hidden rounded-xl drop-shadow-xl/50">
+
+                    <!-- bg image -->
+                    <img 
+                        src="{% static 'plugins/serum.png' %}" 
+                        class="absolute inset-0 w-full h-full object-cover"
+                        alt=""
+                    />
+                    <!-- pro/alt label -->
+                    <div class="relative t-40 l-40 w-20 p-2">
+                        <div class="bg-[#004F99] rounded-2xl flex justify-center">
+                            <label class="font-bold">
+                                PRO
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- bottom blurred info panel -->
+                    <div class="absolute bottom-0 w-full h-1/3 
+                                bg-black/40 backdrop-blur-sm 
+                                flex flex-col p-4 text-white">
+
+                        <label class="text-sm text-gray-200">
+                            Synth, Effect, Compressor
+                        </label>
+
+                        <label class="text-lg font-semibold mt-1">
+                            Serum
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <!-- daw example -->
+            <div class="plugin_element flex flex-col p-5">
+                <div class="relative w-64 aspect-square overflow-hidden rounded-xl drop-shadow-xl/50">
+
+                    <!-- bg image -->
+                    <img 
+                        src="{% static 'plugins/ableton.avif' %}" 
+                        class="absolute inset-0 w-full h-full object-cover"
+                        alt=""
+                    />
+                    <!-- pro/alt label -->
+                    <div class="relative t-40 l-40 w-20 p-2">
+                        <div class="bg-[#004F99] rounded-2xl flex justify-center">
+                            <label class="font-bold">
+                                PRO
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- bottom blurred info panel -->
+                    <div class="absolute bottom-0 w-full h-1/3 
+                                bg-black/40 backdrop-blur-sm 
+                                flex flex-col p-4 text-white">
+
+                        <label class="text-sm text-gray-200">
+                            DAW
+                        </label>
+
+                        <label class="text-lg font-semibold mt-1">
+                            Ableton
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="plugin__plugins flex flex-wrap">
+        {% for plugin in pro_plugins %}
+        <a href="{% url 'plugin_detail' plugin.pk %}" class="block">
+            <div class="plugin_element flex flex-col p-5">
+                <div class="relative w-64 aspect-square overflow-hidden rounded-xl drop-shadow-xl/50">
+
+                    <!-- plugin background image -->
+                    <img 
+                       src="{% static 'plugins/' %}{{ plugin.image }}"
+                        class="absolute inset-0 w-full h-full object-cover"
+                        alt="{{ plugin.name }}"
+                    />
+
+                    <!-- PRO label -->
+                    <div class="absolute top-3 left-3 w-20 p-1">
+                        <div class="bg-[#004F99] rounded-2xl flex justify-center">
+                            <label class="font-bold">PRO</label>
+                        </div>
+                    </div>
+
+                    <!-- bottom blurred info panel -->
+                    <div class="absolute bottom-0 w-full h-1/3 
+                                bg-black/40 backdrop-blur-sm 
+                                flex flex-col p-4 text-white">
+
+                        <label class="text-sm text-gray-200">
+                            {{ plugin.get_category_display }}
+                        </label>
+
+                        <label class="text-lg font-semibold mt-1">
+                            {{ plugin.name }}
+                        </label>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <p class="text-gray-500 p-6">No plugins added yet.</p>
+        </a>
+    {% endfor %}
+</div>
 </div>
 {% endblock %}
