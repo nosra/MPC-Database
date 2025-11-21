@@ -10,41 +10,75 @@
             <label class="category__title font-bold text-center">
                 Categories
             </label>
-                <!-- pro/alt pills  -->
+
+            <!-- pro/alt pills  -->
             <div class="flex gap-2 justify-center">
-                <button class="px-3 py-1 rounded-full bg-[#004F99] text-sm font-semibold hover:bg-[#005FCC] transition-colors duration-200">PRO</button>
-                <button class="px-3 py-1 rounded-full bg-[#1A356B] text-sm font-semibold hover:bg-[#005FCC] transition-colors duration-200">ALT</button>
+                <a href="{% url 'plugins' %}?tab=pro{% if active_category %}&category={{ active_category }}{% endif %}"
+                class="px-3 py-1 rounded-full text-sm font-semibold transition-colors duration-200
+                        {% if active_tab == 'pro' %}
+                            bg-[#004F99] text-white
+                        {% else %}
+                            bg-[#1A356B] text-white hover:bg-[#005FCC]
+                        {% endif %}">
+                    PRO
+                </a>
+
+                <a href="{% url 'plugins' %}?tab=alt{% if active_category %}&category={{ active_category }}{% endif %}"
+                class="px-3 py-1 rounded-full text-sm font-semibold transition-colors duration-200
+                        {% if active_tab == 'alt' %}
+                            bg-[#004F99] text-white
+                        {% else %}
+                            bg-[#1A356B] text-white hover:bg-[#005FCC]
+                        {% endif %}">
+                    ALT
+                </a>
             </div>
-            <div class="category__pill flex flex-row gap-2 items-center rounded-4xl p-2 hover:bg-[#004F99] transition-colors duration-200">
+
+            <!-- category pills -->
+            <a href="{% url 'plugins' %}?tab={{ active_tab }}&category=EFX"
+            class="category__pill flex flex-row gap-2 items-center rounded-4xl p-2 transition-colors duration-200 cursor-pointer
+                    {% if active_category == 'EFX' %} bg-[#004F99] text-white {% else %} hover:bg-[#004F99] {% endif %}">
                 <img class="size-7" src="{% static 'plugins/effects.svg' %}"/>
-                <label class="category">
+                <span class="category">
                     Effects
-                </label>
-            </div>
-            <div class="category__pill flex flex-row gap-2 items-center rounded-4xl p-2 hover:bg-[#004F99] transition-colors duration-200">
+                </span>
+            </a>
+
+            <a href="{% url 'plugins' %}?tab={{ active_tab }}&category=SYN"
+            class="category__pill flex flex-row gap-2 items-center rounded-4xl p-2 transition-colors duration-200 cursor-pointer
+                    {% if active_category == 'SYN' %} bg-[#004F99] text-white {% else %} hover:bg-[#004F99] {% endif %}">
                 <img class="size-7" src="{% static 'plugins/synth.svg' %}"/>
-                <label class="category">
+                <span class="category">
                     Synths
-                </label>
-            </div>
-            <div class="category__pill flex flex-row gap-2 items-center rounded-4xl p-2 hover:bg-[#004F99] transition-colors duration-200">
+                </span>
+            </a>
+
+            <a href="{% url 'plugins' %}?tab={{ active_tab }}&category=CMP"
+            class="category__pill flex flex-row gap-2 items-center rounded-4xl p-2 transition-colors duration-200 cursor-pointer
+                    {% if active_category == 'CMP' %} bg-[#004F99] text-white {% else %} hover:bg-[#004F99] {% endif %}">
                 <img class="size-7" src="{% static 'plugins/compress.svg' %}"/>
-                <label class="category">
+                <span class="category">
                     Compressors
-                </label>
-            </div>
-            <div class="category__pill flex flex-row gap-2 items-center rounded-4xl p-2 hover:bg-[#004F99] transition-colors duration-200">
+                </span>
+            </a>
+
+            <a href="{% url 'plugins' %}?tab={{ active_tab }}&category=DST"
+            class="category__pill flex flex-row gap-2 items-center rounded-4xl p-2 transition-colors duration-200 cursor-pointer
+                    {% if active_category == 'DST' %} bg-[#004F99] text-white {% else %} hover:bg-[#004F99] {% endif %}">
                 <img class="size-7" src="{% static 'plugins/distort.svg' %}"/>
-                <label class="category">
+                <span class="category">
                     Distorters
-                </label>
-            </div>
-            <div class="category__pill flex flex-row gap-2 items-center rounded-4xl p-2 hover:bg-[#004F99] transition-colors duration-200">
+                </span>
+            </a>
+
+            <a href="{% url 'plugins' %}?tab={{ active_tab }}&category=DAW"
+            class="category__pill flex flex-row gap-2 items-center rounded-4xl p-2 transition-colors duration-200 cursor-pointer
+                    {% if active_category == 'DAW' %} bg-[#004F99] text-white {% else %} hover:bg-[#004F99] {% endif %}">
                 <img class="size-7" src="{% static 'plugins/mixer.svg' %}"/>
-                <label class="category">
+                <span class="category">
                     DAW
-                </label>
-            </div>
+                </span>
+            </a>
         </div>
     </div>
     <div class="plugin__view grow bg-white rounded-3xl mr-12">
@@ -71,151 +105,67 @@
                 </svg>
             </div>
         </div>
+        
+
         <!-- this will be where the plugins are -->
-        <!-- fabfilter example -->
-        <div class="plugin__plugins flex flex-row">
-            <div class="plugin_element flex flex-col p-5">
-                <div class="relative w-64 aspect-square overflow-hidden rounded-xl drop-shadow-xl/50">
-
-                    <!-- bg image -->
-                    <img 
-                        src="{% static 'plugins/pro-q-3-intro.jpg' %}" 
-                        class="absolute inset-0 w-full h-full object-cover"
-                        alt=""
-                    />
-
-                    <!-- pro/alt label -->
-                    <div class="relative t-40 l-40 w-20 p-2">
-                        <div class="bg-[#004F99] rounded-2xl flex justify-center">
-                            <label class="font-bold">
-                                PRO
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- bottom blurred info panel -->
-                    <div class="absolute bottom-0 w-full h-1/3 
-                                bg-black/40 backdrop-blur-sm 
-                                flex flex-col p-4 text-white">
-
-                        <label class="text-sm text-gray-200">
-                            Effect, Compressor
-                        </label>
-
-                        <label class="text-lg font-semibold mt-1">
-                            FabFilter Pro-Q 3
-                        </label>
-                    </div>
-                </div>
-            </div>
-            <!-- synth example -->
-            <div class="plugin_element flex flex-col p-5">
-                <div class="relative w-64 aspect-square overflow-hidden rounded-xl drop-shadow-xl/50">
-
-                    <!-- bg image -->
-                    <img 
-                        src="{% static 'plugins/serum.png' %}" 
-                        class="absolute inset-0 w-full h-full object-cover"
-                        alt=""
-                    />
-                    <!-- pro/alt label -->
-                    <div class="relative t-40 l-40 w-20 p-2">
-                        <div class="bg-[#004F99] rounded-2xl flex justify-center">
-                            <label class="font-bold">
-                                PRO
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- bottom blurred info panel -->
-                    <div class="absolute bottom-0 w-full h-1/3 
-                                bg-black/40 backdrop-blur-sm 
-                                flex flex-col p-4 text-white">
-
-                        <label class="text-sm text-gray-200">
-                            Synth, Effect, Compressor
-                        </label>
-
-                        <label class="text-lg font-semibold mt-1">
-                            Serum
-                        </label>
-                    </div>
-                </div>
-            </div>
-            <!-- daw example -->
-            <div class="plugin_element flex flex-col p-5">
-                <div class="relative w-64 aspect-square overflow-hidden rounded-xl drop-shadow-xl/50">
-
-                    <!-- bg image -->
-                    <img 
-                        src="{% static 'plugins/ableton.avif' %}" 
-                        class="absolute inset-0 w-full h-full object-cover"
-                        alt=""
-                    />
-                    <!-- pro/alt label -->
-                    <div class="relative t-40 l-40 w-20 p-2">
-                        <div class="bg-[#004F99] rounded-2xl flex justify-center">
-                            <label class="font-bold">
-                                PRO
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- bottom blurred info panel -->
-                    <div class="absolute bottom-0 w-full h-1/3 
-                                bg-black/40 backdrop-blur-sm 
-                                flex flex-col p-4 text-white">
-
-                        <label class="text-sm text-gray-200">
-                            DAW
-                        </label>
-
-                        <label class="text-lg font-semibold mt-1">
-                            Ableton
-                        </label>
-                    </div>
-                </div>
-            </div>
-        </div>
         <div class="plugin__plugins flex flex-wrap">
-        {% for plugin in pro_plugins %}
-        <a href="{% url 'plugin_detail' plugin.pk %}" class="block">
-            <div class="plugin_element flex flex-col p-5">
-                <div class="relative w-64 aspect-square overflow-hidden rounded-xl drop-shadow-xl/50">
+            {% for plugin in plugins %}
+                {% if active_tab == 'pro' %}
+                    <a href="{% url 'plugin_detail' plugin.pk %}" class="block cursor-pointer">
+                {% else %}
+                    <a href="{% url 'alt_plugin_detail' plugin.pk %}" class="block cursor-pointer">
+                {% endif %}
+                    <div class="plugin_element flex flex-col p-5 cursor-pointer">
+                        <div class="relative w-64 aspect-square overflow-hidden rounded-xl drop-shadow-xl/50">
 
-                    <!-- plugin background image -->
-                    <img 
-                       src="{% static 'plugins/' %}{{ plugin.image }}"
-                        class="absolute inset-0 w-full h-full object-cover"
-                        alt="{{ plugin.name }}"
-                    />
+                            {% if plugin.image %}
+                                <img
+                                    src="{{ plugin.image.url }}"
+                                    class="absolute inset-0 w-full h-full object-cover"
+                                    alt="{{ plugin.name }}"
+                                />
+                            {% else %}
+                                <img
+                                    src="{% static 'plugins/default-plugin.png' %}"
+                                    class="absolute inset-0 w-full h-full object-cover"
+                                    alt="{{ plugin.name }}"
+                                />
+                            {% endif %}
 
-                    <!-- PRO label -->
-                    <div class="absolute top-3 left-3 w-20 p-1">
-                        <div class="bg-[#004F99] rounded-2xl flex justify-center">
-                            <label class="font-bold">PRO</label>
+                            <!-- label -->
+                            <div class="absolute top-3 left-3 w-20 p-1">
+                                <div class="rounded-2xl flex justify-center
+                                            {% if active_tab == 'pro' %} bg-[#004F99] {% else %} bg-[#1A356B] {% endif %}">
+                                    <label class="font-bold">
+                                        {% if active_tab == 'pro' %}PRO{% else %}ALT{% endif %}
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- bottom blurred info panel -->
+                            <div class="absolute bottom-0 w-full h-1/3 
+                                        bg-black/40 backdrop-blur-sm 
+                                        flex flex-col p-4 text-white">
+                                <div class="flex flex-row justify-between">
+                                    <label class="text-sm text-gray-200">
+                                        {{ plugin.get_category_display }}
+                                    </label>
+                                    <label class="text-sm font-bold text-gray-50">
+                                        ${{ plugin.price }}
+                                    </label>
+                                </div>
+
+                                <label class="text-lg font-semibold mt-1">
+                                    {{ plugin.name }}
+                                </label>
+                            </div>
                         </div>
                     </div>
-
-                    <!-- bottom blurred info panel -->
-                    <div class="absolute bottom-0 w-full h-1/3 
-                                bg-black/40 backdrop-blur-sm 
-                                flex flex-col p-4 text-white">
-
-                        <label class="text-sm text-gray-200">
-                            {{ plugin.get_category_display }}
-                        </label>
-
-                        <label class="text-lg font-semibold mt-1">
-                            {{ plugin.name }}
-                        </label>
-                    </div>
-                </div>
-            </div>
-        {% empty %}
-            <p class="text-gray-500 p-6">No plugins added yet.</p>
-        </a>
-    {% endfor %}
-</div>
+                </a>
+            {% empty %}
+                <p class="text-gray-500 p-6">No plugins added yet.</p>
+            {% endfor %}
+        </div>
+    </div>
 </div>
 {% endblock %}

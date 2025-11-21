@@ -16,6 +16,15 @@ class CustomUserAdmin(UserAdmin):
         "is_staff",
         "is_active",
     ]
+     # show avatar on the change form
+    fieldsets = UserAdmin.fieldsets + (
+        ("Profile", {"fields": ("avatar",)}),
+    )
+
+    # show avatar on the add form
+    add_fieldsets = UserAdmin.add_fieldsets + (
+        (None, {"fields": ("avatar",)}),
+    )
 
 
 admin.site.register(CustomUser, CustomUserAdmin)
