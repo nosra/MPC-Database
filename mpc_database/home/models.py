@@ -25,6 +25,7 @@ CATEGORIES = {
     ("SYN", "Synth"),
     ("CMP", "Compressor"),
     ("DST", "Distorter"),
+    ("DAW", "Digital Audio Workstation")
 }
 
 # an alternative plugin can be an alternative to many pro plugins, and a pro plugin can have many alternatives
@@ -39,8 +40,11 @@ class AlternativePlugin(models.Model):
     # size of the plugin in MB, this will be converted to KB, MB, GB at the app level
     size = models.DecimalField(max_digits=5, decimal_places=2)
     download_link = models.CharField(max_length=99)
+    
+    # this will define an image path from static/plugins/
+    image = models.CharField(max_length=99, null=True, blank=True)
 
-    def __str__():
+    def __str__(self):
         return self.name
 
 
@@ -56,7 +60,14 @@ class ProPlugin(models.Model):
     size = models.DecimalField(max_digits=5, decimal_places=2)
     # implied this is a VST, so it should work on all OSes.
     download_link = models.CharField(max_length=99)
-    alternatives = models.ManyToManyField(AlternativePlugin, related_name="pro_plugins")
+    
+    # this will define an image path from static/plugins/
+    image = models.CharField(max_length=99, null=True, blank=True)
+    
+    # mtm with pro plugin
+    alternatives = models.ManyToManyField(AlternativePlugin, related_name="pro_plugins", blank=True)
 
-    def __str__():
+    def __str__(self):
         return self.name
+
+
