@@ -10,8 +10,12 @@ from django.contrib.auth.models import AbstractUser
 # is_staff, is_superuser, is_active
 # last_login, date_joined
 class CustomUser(AbstractUser):
-    pass
-    # add additional fields in here
+    # optional profile picture
+    avatar = models.ImageField(
+        upload_to="avatars/",
+        null=True,
+        blank=True
+    )
 
     def __str__(self):
         return self.username
@@ -41,8 +45,8 @@ class AlternativePlugin(models.Model):
     size = models.DecimalField(max_digits=5, decimal_places=2)
     download_link = models.CharField(max_length=99)
     
-    # this will define an image path from static/plugins/
-    image = models.CharField(max_length=99, null=True, blank=True)
+    # using django's imagefield to upload an image
+    image = models.ImageField(upload_to="plugin_images/", null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -61,8 +65,8 @@ class ProPlugin(models.Model):
     # implied this is a VST, so it should work on all OSes.
     download_link = models.CharField(max_length=99)
     
-    # this will define an image path from static/plugins/
-    image = models.CharField(max_length=99, null=True, blank=True)
+    # using django's imagefield to upload an image
+    image = models.ImageField(upload_to="plugin_images/", null=True, blank=True)
     
     # mtm with pro plugin
     alternatives = models.ManyToManyField(AlternativePlugin, related_name="pro_plugins", blank=True)
