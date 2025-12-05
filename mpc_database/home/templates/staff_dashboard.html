@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Submissions{% endblock %}
+
+{% block content %}
+<!-- TODO: actually make this page -->
+<div class="window flex min-h-dvh w-full border-[#004F99] overflow-hidden">
+    <div class="plugin__view grow bg-white rounded-none">
+        <form method="post" action="{% url 'staff_logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="text-xl text-black underline">
+                Log out
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}
