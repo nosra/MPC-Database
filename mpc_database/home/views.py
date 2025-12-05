@@ -2,10 +2,16 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from django.template import loader
 from .models import ProPlugin, AlternativePlugin, CATEGORIES
+from django.contrib.auth import authenticate # only for users, thoughf
+from django.contrib.auth.decorators import user_passes_test
 
 def home(request):
     template = loader.get_template('home.html')
     return HttpResponse(template.render())
+
+# ---------
+# plugins routers
+# ---------
 
 def plugins(request):
     tab = request.GET.get("tab", "pro")
@@ -25,7 +31,7 @@ def plugins(request):
         plugins_qs = plugins_qs.filter(category=category)
         active_category = category
     else:
-        active_category = None  # "All"
+        active_category = None # "All"
 
     return render(request, "plugins.html", {
         "plugins": plugins_qs,
@@ -40,3 +46,17 @@ def plugin_detail(request, pk):
 def alt_plugin_detail(request, pk):
     plugin = get_object_or_404(AlternativePlugin, pk=pk)
     return render(request, 'alt_plugin_detail.html', {"plugin": plugin})
+
+# ---------
+# submissions routers
+# ---------
+def staff_check(user):
+    return user.is_staff
+
+# handled by logout view (built in class)
+def staff_logout(user):
+    pass
+
+@user_passes_test(staff_check, login_url="staff_login")
+def staff_dashboard(request):
+    return render(request, "staff_dashboard.html")
