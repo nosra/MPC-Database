@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from django.template import loader
+from django.db.models import Q              # 🔸 add this
 from .models import ProPlugin, AlternativePlugin, CATEGORIES
 from django.contrib.auth import authenticate # only for users, thoughf
 from django.contrib.auth.decorators import user_passes_test
@@ -16,6 +17,7 @@ def home(request):
 def plugins(request):
     tab = request.GET.get("tab", "pro")
     category = request.GET.get("category")
+    search_query = (request.GET.get("q") or "").strip()
 
     # figure out which list we're showing
     if tab == "alt":
@@ -33,15 +35,34 @@ def plugins(request):
     else:
         active_category = None # "All"
 
-    return render(request, "plugins.html", {
+    # apply search filter if there's a query
+    if search_query:
+        plugins_qs = plugins_qs.filter(
+            Q(name__icontains=search_query)
+            # other filters can be requested too
+            # | Q(description__icontains=search_query)
+            # | Q(company__icontains=search_query)
+        )
+
+    context = {
         "plugins": plugins_qs,
         "active_tab": active_tab,
         "active_category": active_category,
-    })
-    
+        "search_query": search_query,
+    }
+
+    # ajax request, only return the list HTML
+    if request.headers.get("x-requested-with") == "XMLHttpRequest":
+        return render(request, "partials/plugin_cards.html", context)
+
+    # otherwise full page render
+    return render(request, "plugins.html", context)
+
+
 def plugin_detail(request, pk):
     plugin = get_object_or_404(ProPlugin, pk=pk)
     return render(request, "plugin_detail.html", {"plugin": plugin})
+
 
 def alt_plugin_detail(request, pk):
     plugin = get_object_or_404(AlternativePlugin, pk=pk)
