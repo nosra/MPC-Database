@@ -1,5 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.templatetags.static import static
+from django.core.files.storage import default_storage
+
 
 # -----------------------
 # USERS
@@ -47,9 +50,14 @@ class AlternativePlugin(models.Model):
     
     # using django's imagefield to upload an image
     image = models.ImageField(upload_to="plugin_images/", null=True, blank=True)
-
-    def __str__(self):
-        return self.name
+    
+    # fallback for no image
+    @property
+    def image_url(self):
+        if self.image and default_storage.exists(self.image.name):
+            return self.image.url
+        # fallback to static default
+        return static("plugins/default-plugin.jpg")
 
 
 class ProPlugin(models.Model):
@@ -67,6 +75,14 @@ class ProPlugin(models.Model):
     
     # using django's imagefield to upload an image
     image = models.ImageField(upload_to="plugin_images/", null=True, blank=True)
+    
+    # fallback for no image
+    @property
+    def image_url(self):
+        if self.image and default_storage.exists(self.image.name):
+            return self.image.url
+        # fallback to static default
+        return static("plugins/default-plugin.jpg")
     
     # mtm with pro plugin
     alternatives = models.ManyToManyField(AlternativePlugin, related_name="pro_plugins", blank=True)
