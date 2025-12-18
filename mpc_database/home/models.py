@@ -27,13 +27,13 @@ class CustomUser(AbstractUser):
 # PLUGINS
 # -----------------------
 
-CATEGORIES = {
+CATEGORIES = [
     ("EFX", "Effect"),
     ("SYN", "Synth"),
     ("CMP", "Compressor"),
     ("DST", "Distorter"),
-    ("DAW", "Digital Audio Workstation")
-}
+    ("DAW", "Digital Audio Workstation"),
+]
 
 # an alternative plugin can be an alternative to many pro plugins, and a pro plugin can have many alternatives
 class AlternativePlugin(models.Model):

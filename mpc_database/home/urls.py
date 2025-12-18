@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, reverse_lazy
 from . import views
 from django.contrib.auth import views as auth_views
 from .forms import StaffLoginForm
@@ -13,7 +13,7 @@ urlpatterns = [
         auth_views.LoginView.as_view(
             template_name="staff_login.html",
             authentication_form=StaffLoginForm,
-            redirect_authenticated_user=True,
+            next_page=reverse_lazy("staff_dashboard"),
         ),
         name="staff_login",
     ),
