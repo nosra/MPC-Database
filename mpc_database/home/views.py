@@ -1,10 +1,12 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from django.template import loader
-from django.db.models import Q              # 🔸 add this
+from django.db.models import Q
 from .models import ProPlugin, AlternativePlugin, CATEGORIES
-from django.contrib.auth import authenticate # only for users, thoughf
+from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import user_passes_test
+from .forms import StaffPluginSubmission
+from django.contrib import messages
 
 def home(request):
     template = loader.get_template('home.html')
@@ -80,4 +82,35 @@ def staff_logout(user):
 
 @user_passes_test(staff_check, login_url="staff_login")
 def staff_dashboard(request):
-    return render(request, "staff_dashboard.html")
+    # post requests here will refer to adding a new plugin
+    if request.method == "POST":
+        # create a form instance, populate it with the data from the request
+        form = StaffPluginSubmission(request.POST, request.FILES)
+        if form.is_valid():
+            data = form.cleaned_data
+
+            common = dict(
+                submitter=request.user,
+                name=data["plugin_name"],
+                date_released=data["date_released"],
+                category=data["category"],
+                price=data["price"],
+                description=data["description"],
+                size=data["size"],
+                download_link=data["download_link"],
+                image=data.get("image"),
+            )
+
+            if data["plugin_type"] == "PRO":
+                ProPlugin.objects.create(**common)
+            else:
+                alt = AlternativePlugin.objects.create(**common)
+                for pro in data["link_to_pro_plugins"]:
+                    pro.alternatives.add(alt)
+
+            messages.success(request, "Plugin submitted!")
+            return redirect("staff_dashboard")
+        
+    else:
+        form = StaffPluginSubmission()
+    return render(request, "staff_dashboard.html", {"form": form})

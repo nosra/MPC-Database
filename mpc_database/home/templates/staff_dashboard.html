@@ -1,17 +1,279 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 {% load static %}
+
 {% block title %}Submissions{% endblock %}
 
 {% block content %}
-<!-- TODO: actually make this page -->
-<div class="window flex min-h-dvh w-full border-[#004F99] overflow-hidden">
-    <div class="plugin__view grow bg-white rounded-none">
+<div class="min-h-dvh w-full bg-slate-50 py-10 px-4">
+  <div class="mx-auto w-full max-w-3xl">
+    <div class="overflow-hidden rounded-3xl bg-white shadow-xl border border-slate-200">
+
+      <!-- header -->
+      <div class="flex items-center justify-between gap-4 p-6 border-b border-slate-200">
+        <div class="flex items-center gap-4">
+          {% if request.user.avatar %}
+            <img
+              src="{{ request.user.avatar.url }}"
+              class="h-12 w-12 rounded-full object-cover"
+              alt="Avatar"
+            />
+          {% else %}
+            <div class="h-12 w-12 rounded-full bg-slate-200 flex items-center justify-center font-semibold text-slate-700">
+              {{ request.user.username|slice:":2"|upper }}
+            </div>
+          {% endif %}
+
+          <div class="leading-tight">
+            <p class="text-sm text-slate-500">Staff</p>
+            <h1 class="text-2xl font-semibold text-slate-900">Submit a new plugin</h1>
+            <p class="text-sm text-slate-600">Hello, {{ request.user.username }}</p>
+          </div>
+        </div>
+
         <form method="post" action="{% url 'staff_logout' %}">
-            {% csrf_token %}
-            <button type="submit" class="text-xl text-black underline">
-                Log out
-            </button>
+          {% csrf_token %}
+          <button type="submit" class="text-sm font-medium text-slate-600 hover:text-slate-900">
+            Log out
+          </button>
         </form>
+      </div>
+
+      <!-- body -->
+      <div class="p-6">
+        {% if form.non_field_errors %}
+          <div class="mb-4 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+            {{ form.non_field_errors }}
+          </div>
+        {% endif %}
+
+        <form method="post" enctype="multipart/form-data" class="space-y-6">
+          {% csrf_token %}
+
+          <!-- top row -->
+        <div class="flex flex-col mb-4">
+            <label class="block text-sm font-medium text-slate-700 mb-1">Plugin type</label>
+            <div class="bg-white text-black rounded-md">
+                {{ form.plugin_type }}
+            </div>
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">
+            {{ form.plugin_name.label }}
+            </label>
+            {{ form.plugin_name }}
+            {% if form.plugin_name.errors %}
+            <p class="mt-1 text-sm text-red-600">{{ form.plugin_name.errors|striptags }}</p>
+            {% endif %}
+        </div>
+
+        <!-- grid, not overusing flexbox for once -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">
+                    {{ form.date_released.label }}
+                </label>
+                {{ form.date_released }}
+                {% if form.date_released.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.date_released.errors|striptags }}</p>
+                {% endif %}
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">
+                    {{ form.category.label }}
+                </label>
+                    {{ form.category }}
+                    {% if form.category.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.category.errors|striptags }}</p>
+                    {% endif %}
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">
+                    {{ form.price.label }}
+                </label>
+                {{ form.price }}
+                {% if form.price.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.price.errors|striptags }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">
+                    {{ form.size.label }}
+                </label>
+                {{ form.size }}
+                {% if form.size.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.size.errors|striptags }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+          <!-- desc -->
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">
+              {{ form.description.label }}
+            </label>
+            {{ form.description }}
+            {% if form.description.errors %}
+              <p class="mt-1 text-sm text-red-600">{{ form.description.errors|striptags }}</p>
+            {% endif %}
+          </div>
+
+          <!-- link -->
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">
+              {{ form.download_link.label }}
+            </label>
+            {{ form.download_link }}
+            {% if form.download_link.errors %}
+                <p class="mt-1 text-sm text-red-600">{{ form.download_link.errors|striptags }}</p>
+            {% endif %}
+          </div>
+
+        <!-- image -->
+        <div>
+        <label class="block text-sm font-medium text-slate-700 mb-2">
+            {{ form.image.label }}
+        </label>
+        {{ form.image }}
+        {% if form.image.errors %}
+            <p class="mt-2 text-sm text-red-600">{{ form.image.errors|striptags }}</p>
+        {% endif %}
+        <p class="mt-2 text-xs text-slate-500">PNG/JPG recommended. Optional.</p>
+        </div>
+
+        <!-- link to pro plugins -->
+        <div id="linkToProsWrap" class="mt-6">
+            <div class="flex items-end justify-between gap-3">
+                <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">
+                    {{ form.link_to_pro_plugins.label }}
+                </label>
+                <p class="text-xs text-slate-500">{{ form.link_to_pro_plugins.help_text }}</p>
+                </div>
+                <div class="w-60">
+                <label class="sr-only">Search Pro plugins</label>
+                <input
+                    id="proSearch"
+                    type="text"
+                    placeholder="Search…"
+                    class="block w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm
+                        text-slate-900 placeholder-slate-400 shadow-sm
+                        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+                </div>
+            </div>
+
+            <div
+                id="proList"
+                class="mt-3 max-h-72 overflow-auto rounded-2xl border text-slate-900 border-slate-200 bg-slate-50 p-3"
+            >
+                <!-- django renders CheckboxSelectMultiple as a <ul><li>... structure -->
+                {{ form.link_to_pro_plugins }}
+            </div>
+
+            {% if form.link_to_pro_plugins.errors %}
+                <p class="mt-2 text-sm text-red-600">{{ form.link_to_pro_plugins.errors|striptags }}</p>
+            {% endif %}
+            </div>
+
+            <!-- quick js to handle alt/pro plugin select -->
+            <script>
+                (function () {
+                    const typeSel = document.getElementById("id_plugin_type");
+                    const wrap = document.getElementById("linkToProsWrap");
+                    const search = document.getElementById("proSearch");
+                    const list = document.getElementById("proList");
+
+                    function getChoiceContainer() {
+                        // django usually renders: <div id="id_link_to_pro_plugins"> ... </div>
+                        return document.getElementById("id_link_to_pro_plugins") || list?.querySelector("#id_link_to_pro_plugins");
+                    }
+
+                    function getRows() {
+                        const container = getChoiceContainer();
+                        if (!container) return [];
+                            // direct children are typically the rows
+                            return Array.from(container.children).filter(el => el.querySelector('input[type="checkbox"]'));
+                    }
+
+                    // dont show if we're submitting a pro plugin
+                    function showHideAltOnly() {
+                        if (!typeSel || !wrap) return;
+                        wrap.style.display = (typeSel.value === "ALT") ? "block" : "none";
+                    }
+
+                    // formatting for checkbox
+                    function prettifyCheckboxList() {
+                        const rows = getRows();
+                        rows.forEach(row => {
+                            row.classList.add(
+                            "flex", "items-center", "rounded-xl", "bg-white", "border", "border-slate-200",
+                            "px-3", "py-2"
+                            );
+
+                            const label = row.querySelector("label");
+                            if (label) {
+                            // putting spacing between checkbox and text
+                                label.style.display = "flex";
+                                label.style.alignItems = "center";
+                                label.style.gap = "0.75rem";
+                                label.style.cursor = "pointer";
+                                label.style.color = "#0f172a";
+                                label.style.fontWeight = "500";
+                                label.style.width = "100%";
+                            }
+
+                            const container = getChoiceContainer();
+                            if (container) {
+                                container.style.display = "flex";
+                                container.style.flexDirection = "column";
+                                container.style.gap = "0.75rem";
+                            }
+
+                            const input = row.querySelector('input[type="checkbox"]');
+                            if (input) {
+                                input.style.margin = "0";
+                            }
+                        });
+                    }
+
+                    function filterList() {
+                        const q = (search?.value || "").trim().toLowerCase();
+                        const rows = getRows();
+
+                        rows.forEach(row => {
+                            const text = row.textContent.trim().toLowerCase();
+                            row.style.display = text.includes(q) ? "" : "none";
+                        });
+                    }
+
+                    if (typeSel) typeSel.addEventListener("change", showHideAltOnly);
+                    if (search) search.addEventListener("input", filterList);
+
+                    showHideAltOnly();
+                    prettifyCheckboxList();
+                    filterList();
+                })();
+            </script>
+
+
+            <!-- actions -->
+            <div class="flex items-center justify-end gap-3 pt-2">
+                <a href="#" class="text-sm font-medium text-slate-600 hover:text-slate-900">
+                Cancel
+                </a>
+                <button
+                type="submit"
+                class="inline-flex items-center justify-center rounded-xl bg-blue-600 px-5 py-2.5 text-white font-semibold shadow-sm hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                Submit plugin
+                </button>
+            </div>
+        </form>
+      </div>
+
     </div>
+  </div>
 </div>
 {% endblock %}
