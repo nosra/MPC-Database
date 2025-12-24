@@ -1,7 +1,8 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.template import loader
 from django.db.models import Q
+from django.urls import reverse
 from .models import ProPlugin, AlternativePlugin, CATEGORIES
 from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import user_passes_test
@@ -114,3 +115,35 @@ def staff_dashboard(request):
     else:
         form = StaffPluginSubmission()
     return render(request, "staff_dashboard.html", {"form": form})
+
+def about(request):
+    return render(request, "about.html")
+
+def search_plugins(request):
+    query = request.GET.get('q', '')
+    results = []
+
+    if len(query) > 1:
+        # search free Alternatives
+        alts = AlternativePlugin.objects.filter(name__icontains=query)[:3]
+        for item in alts:
+            results.append({
+                'name': item.name,
+                'category': item.get_category_display(),
+                'type': 'Free',
+                'image': item.image_url,
+                'url': reverse('alt_plugin_detail', args=[item.pk]) 
+            })
+
+        # search Pro Plugins
+        pros = ProPlugin.objects.filter(name__icontains=query)[:3]
+        for item in pros:
+            results.append({
+                'name': item.name,
+                'category': item.get_category_display(),
+                'type': 'Pro/Paid',
+                'image': item.image_url,
+                'url': reverse('plugin_detail', args=[item.pk]) 
+            })
+
+    return JsonResponse({'results': results})

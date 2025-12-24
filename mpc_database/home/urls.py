@@ -19,5 +19,8 @@ urlpatterns = [
     ),
     path("staff_logout/", auth_views.LogoutView.as_view(next_page="staff_login"), name="staff_logout"),
     path("staff_dashboard/", views.staff_dashboard, name="staff_dashboard"),
+    path("about/", views.about, name="about"),
+    path('ajax/search/', views.search_plugins, name='ajax_search')
+    
 ]
 

@@ -11,21 +11,86 @@
         <h1 class="text-2xl text-blue-200 cursor-default">for thrifty producers</h1>
     </div>
 </div>
-<!-- search bar -->
-<div class="w-full max-w-3xl mx-auto">
-  <div class="relative">
-    <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
-      <img src="{% static 'homepage/mag-glass.svg' %}" class="h-6 w-6 text-gray-400"/>
+
+<div class="w-full max-w-3xl mx-auto relative z-50"> <div class="relative">
+        <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+            <img src="{% static 'homepage/mag-glass.svg' %}" class="h-6 w-6 text-gray-400"/>
+        </div>
+
+        <input 
+            type="search" 
+            name="search" 
+            id="search-input" 
+            autocomplete="off"
+            class="block w-full rounded-full border-0 py-4 pl-14 pr-5 text-xl text-gray-900 bg-white shadow-lg placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" 
+            placeholder="Search for a plugin, get the alternatives..."
+        >
+
+        <div id="search-results" class="absolute top-full left-0 right-0 mt-3 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl overflow-hidden hidden border border-gray-100">
+            <ul id="results-list" class="divide-y divide-gray-100">
+                </ul>
+        </div>
     </div>
-
-    <input 
-      type="search" 
-      name="search" 
-      id="search" 
-      class="block w-full rounded-full border-0 py-4 pl-14 pr-5 text-xl text-gray-900 bg-white shadow-lg placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500" 
-      placeholder="Search for a free synth, reverb, EQ..."
-    >
-
-  </div>
 </div>
+
+<script>
+    const searchInput = document.getElementById('search-input');
+    const resultsContainer = document.getElementById('search-results');
+    const resultsList = document.getElementById('results-list');
+
+    // debounce function to prevent spamming the server while typing
+    let timeout = null;
+
+    searchInput.addEventListener('input', function(e) {
+        clearTimeout(timeout);
+        const query = e.target.value;
+
+        if (query.length < 2) {
+            resultsContainer.classList.add('hidden');
+            return;
+        }
+
+        timeout = setTimeout(() => {
+            fetch(`/ajax/search/?q=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(data => {
+                    resultsList.innerHTML = '';
+                    
+                    if (data.results.length > 0) {
+                        resultsContainer.classList.remove('hidden');
+                        
+                        data.results.forEach(plugin => {
+                            const li = document.createElement('li');
+                            li.innerHTML = `
+                                <a href="${plugin.url}" class="flex items-center gap-4 px-6 py-4 hover:bg-blue-50 transition-colors duration-200 group">
+                                    <img src="${plugin.image}" class="w-12 h-12 rounded-lg object-cover shadow-sm bg-gray-200">
+                                    <div class="flex-1">
+                                        <h4 class="text-lg font-bold text-gray-900 group-hover:text-blue-700">${plugin.name}</h4>
+                                        <p class="text-sm text-gray-500">${plugin.category}</p>
+                                    </div>
+                                    <span class="text-xs font-bold px-2 py-1 rounded-md ${plugin.type === 'Free' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}">
+                                        ${plugin.type}
+                                    </span>
+                                </a>
+                            `;
+                            resultsList.appendChild(li);
+                        });
+                    } else {
+                        // no results message
+                        resultsList.innerHTML = `
+                            <li class="px-6 py-4 text-gray-500 text-center">No plugins found for "${query}"</li>
+                        `;
+                        resultsContainer.classList.remove('hidden');
+                    }
+                });
+        }, 300); // 300ms delay
+    });
+
+    // close dropdown if clicking outside
+    document.addEventListener('click', function(e) {
+        if (!searchInput.contains(e.target) && !resultsContainer.contains(e.target)) {
+            resultsContainer.classList.add('hidden');
+        }
+    });
+</script>
 {% endblock %}
