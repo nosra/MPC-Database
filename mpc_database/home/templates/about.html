@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}About{% endblock %}
+
+{% block content %}
+<div class="min-h-dvh w-full bg-none py-10 px-4">
+    <div class="w-full max-w-full">
+        <!-- product card -->
+    <div class="max-w-10xl mx-auto bg-white/95 rounded-3xl shadow-xl overflow-hidden relative">
+
+        <!-- hero banner -->
+        <div class="relative h-125 md:h-125">
+
+            <img
+                src="{% static 'about/bellefield.jpg' %}"
+                class="absolute inset-0 w-full h-full object-cover"
+                alt="{{ plugin.name }}"
+            />
+
+            <!-- dark/blur overlay -->
+            <div class="absolute inset-0 bg-black/50"></div>
+
+            <!-- content on top of image -->
+            <div class="relative h-full flex flex-col md:flex-row md:items-start justify-end md:justify-between p-6 md:p-8 gap-4 text-white">
+
+                <!-- right: glass info panel -->
+                <div class="w-full text-black md:w-172 bg-white backdrop-blur-md rounded-2xl p-4 md:p-5 shadow-lg border border-white/10 space-y-3">
+                    <div class="flex flex-col items-baseline justify-between space-y-5  ">
+                        <span class="text-6xl font-semibold">
+                            Music Production is Expensive!
+                        </span>
+                        <p class="text-xl text-gray-700 ">
+                                Many industry-level plugins are extremely expensive, making the barrier to entry 
+                                feel impossible for students and beginners. 
+                                <br><br>
+                                That’s why we built this repository. We curate the best free and affordable 
+                                alternatives that stand up to the pros, so you can focus on creativity, 
+                                not your credit card bill.
+                            </p>
+                    </div>
+
+                    <div class="h-px bg-white/10 my-1"></div>
+                    <div class="pt-2">
+                        <a href="{% url 'plugins' %}?tab=pro&category=SYN" 
+                           class="group inline-flex items-center justify-center w-full md:w-auto px-8 py-4 text-lg font-bold text-white transition-all duration-200 bg-[#FFB81C] rounded-xl hover:bg-[#ffd34d] hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900">
+                            Check it out
+                            <svg class="w-5 h-5 ml-2 -mr-1 transition-transform duration-200 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                            </svg>
+                        </a>
+                    </div>
+            </div>
+        </div>
+    </div>
+    <div class="py-16 border-t border-slate-100">
+    <div class="max-w-5xl mx-auto px-4">
+        <h2 class="text-3xl font-bold text-slate-900 mb-10 text-center">Meet the Curators</h2>
+        
+        <div class="flex flex-wrap justify-center gap-10">
+            
+            <div class="text-center group">
+                <div class="w-32 h-32 mx-auto rounded-full overflow-hidden mb-4 ring-4 ring-slate-100 group-hover:ring-[#FFB81C] transition">
+                    <img src="{%static 'about/jl.png' %}"  alt="Member" class="w-full h-full object-cover">
+                </div>
+                <h4 class="text-lg font-bold text-slate-900">Jerry Li</h4>
+                <p class="text-sm text-blue-600 font-semibold uppercase tracking-wide">Business Manager</p>
+                <p class="text-sm text-slate-500 mt-2 max-w-[200px]">"idk"</p>
+            </div>
+
+            <div class="text-center group">
+                <div class="w-32 h-32 mx-auto rounded-full overflow-hidden mb-4 ring-4 ring-slate-100 group-hover:ring-[#FFB81C] transition">
+                    <img src="{%static 'about/hh.png' %}" alt="Member" class="w-full h-full object-cover">
+                </div>
+                <h4 class="text-lg font-bold text-slate-900">Haiden Hunter</h4>
+                <p class="text-sm text-blue-600 font-semibold uppercase tracking-wide">President</p>
+                <p class="text-sm text-slate-500 mt-2 max-w-[200px]">"idk"</p>
+            </div>
+
+             <div class="text-center group">
+                <div class="w-32 h-32 mx-auto rounded-full overflow-hidden mb-4 ring-4 ring-slate-100 group-hover:ring-[#FFB81C] transition">
+                    <img src="{% static 'about/cg.png' %}" alt="Member" class="w-full h-full object-cover">
+                </div>
+                <h4 class="text-lg font-bold text-slate-900">Carson Gollinger</h4>
+                <p class="text-sm text-blue-600 font-semibold uppercase tracking-wide">Vice President</p>
+                <p class="text-sm text-slate-500 mt-2 max-w-[200px]">"Reverb is a necessary evil."</p>
+            </div>
+            
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}
