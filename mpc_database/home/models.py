@@ -45,7 +45,7 @@ class AlternativePlugin(models.Model):
     price = models.IntegerField()
     description = models.TextField()
     # size of the plugin in MB, this will be converted to KB, MB, GB at the app level
-    size = models.DecimalField(max_digits=5, decimal_places=2)
+    size = models.DecimalField(max_digits=8, decimal_places=2)
     download_link = models.CharField(max_length=99)
     
     # using django's imagefield to upload an image
@@ -69,7 +69,7 @@ class ProPlugin(models.Model):
     price = models.IntegerField()
     description = models.TextField()
     # size of the plugin in MB, this will be converted to KB, MB, GB at the app level
-    size = models.DecimalField(max_digits=5, decimal_places=2)
+    size = models.DecimalField(max_digits=8, decimal_places=2)
     # implied this is a VST, so it should work on all OSes.
     download_link = models.CharField(max_length=99)
     
@@ -91,3 +91,5 @@ class ProPlugin(models.Model):
         return self.name
 
 
+class AudioDemo(models.Model):
+    title = models.CharField(max_length=60, blank=True)

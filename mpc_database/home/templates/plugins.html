@@ -4,15 +4,16 @@
 
 {% block content %}
 <!-- getting rid of borders for now -->
-<div class="window flex min-h-dvh w-full border-[#004F99] overflow-hidden">
-    <div class="plugin overflow-auto">
-        <div class="plugin__categories flex flex-col text-left w-full h-full border-[#004F99] pl-10 pr-10 pt-5 gap-3">
-            <label class="category__title font-bold text-center">
-                Categories
-            </label>
-
+<div class="window flex min-h-dvh w-full border-[#004F99]">
+    <div class="plugin">
+        <div class="plugin__categories flex flex-col sticky top-0 text-left w-full border-[#004F99] pl-10 pr-10 pt-5 gap-y-3">
+            <div class="flex flex-row w-full justify-center items-center">
+                <label class="category__title font-bold text-center">
+                    Categories
+                </label>
+            </div>
             <!-- pro/alt pills  -->
-            <div class="flex gap-2 justify-center">
+            <div class="flex gap-2 justify-center pb-5">
                 <a
                     href="{% url 'plugins' %}?tab=pro{% if active_category %}&category={{ active_category }}{% endif %}{% if search_query %}&q={{ search_query|urlencode }}{% endif %}"
                     class="px-3 py-1 rounded-full text-sm font-semibold transition-colors duration-200
@@ -40,7 +41,7 @@
 
             <!-- category pills -->
             <a href="{% url 'plugins' %}?tab={{ active_tab }}&category=EFX"
-            class="category__pill flex flex-row gap-2 items-center rounded-4xl p-2 transition-colors duration-200 cursor-pointer
+            class="category__pill flex flex-row gap-2 items-center rounded-4xl pl-5 pr-15 pt-2 pb-2 p-2 transition-colors duration-200 cursor-pointer
                     {% if active_category == 'EFX' %} bg-[#004F99] text-white {% else %} hover:bg-[#004F99] {% endif %}">
                 <img class="size-7" src="{% static 'plugins/effects.svg' %}"/>
                 <span class="category">
@@ -49,7 +50,7 @@
             </a>
 
             <a href="{% url 'plugins' %}?tab={{ active_tab }}&category=SYN"
-            class="category__pill flex flex-row gap-2 items-center rounded-4xl p-2 transition-colors duration-200 cursor-pointer
+            class="category__pill flex flex-row gap-2 items-center rounded-4xl pl-5 pr-15 pt-2 pb-2 transition-colors duration-200 cursor-pointer
                     {% if active_category == 'SYN' %} bg-[#004F99] text-white {% else %} hover:bg-[#004F99] {% endif %}">
                 <img class="size-7" src="{% static 'plugins/synth.svg' %}"/>
                 <span class="category">
@@ -58,7 +59,7 @@
             </a>
 
             <a href="{% url 'plugins' %}?tab={{ active_tab }}&category=CMP"
-            class="category__pill flex flex-row gap-2 items-center rounded-4xl p-2 transition-colors duration-200 cursor-pointer
+            class="category__pill flex flex-row gap-2 items-center rounded-4xl pl-5 pr-15 pt-2 pb-2 transition-colors duration-200 cursor-pointer
                     {% if active_category == 'CMP' %} bg-[#004F99] text-white {% else %} hover:bg-[#004F99] {% endif %}">
                 <img class="size-7" src="{% static 'plugins/compress.svg' %}"/>
                 <span class="category">
@@ -67,7 +68,7 @@
             </a>
 
             <a href="{% url 'plugins' %}?tab={{ active_tab }}&category=DST"
-            class="category__pill flex flex-row gap-2 items-center rounded-4xl p-2 transition-colors duration-200 cursor-pointer
+            class="category__pill flex flex-row gap-2 items-center rounded-4xl pl-5 pr-15 pt-2 pb-2 transition-colors duration-200 cursor-pointer
                     {% if active_category == 'DST' %} bg-[#004F99] text-white {% else %} hover:bg-[#004F99] {% endif %}">
                 <img class="size-7" src="{% static 'plugins/distort.svg' %}"/>
                 <span class="category">
@@ -76,7 +77,7 @@
             </a>
 
             <a href="{% url 'plugins' %}?tab={{ active_tab }}&category=DAW"
-            class="category__pill flex flex-row gap-2 items-center rounded-4xl p-2 transition-colors duration-200 cursor-pointer
+            class="category__pill flex flex-row gap-2 items-center rounded-4xl pl-5 pr-15 pt-2 pb-2 transition-colors duration-200 cursor-pointer
                     {% if active_category == 'DAW' %} bg-[#004F99] text-white {% else %} hover:bg-[#004F99] {% endif %}">
                 <img class="size-7" src="{% static 'plugins/mixer.svg' %}"/>
                 <span class="category">
