@@ -125,7 +125,7 @@ def search_plugins(request):
 
     if len(query) > 1:
         # search free Alternatives
-        alts = AlternativePlugin.objects.filter(name__icontains=query)[:3]
+        alts = AlternativePlugin.objects.filter(name__icontains=query)[:3] # only going up to 3 plugins
         for item in alts:
             results.append({
                 'name': item.name,
