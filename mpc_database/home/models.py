@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.templatetags.static import static
 from django.core.files.storage import default_storage
-
+from django.core.validators import FileExtensionValidator
 
 # -----------------------
 # USERS
@@ -90,6 +90,34 @@ class ProPlugin(models.Model):
     def __str__(self):
         return self.name
 
+# -----------------------
+# AUDIO DEMOS 
+# -----------------------
 
 class AudioDemo(models.Model):
     title = models.CharField(max_length=60, blank=True)
+    
+    # actual audio file
+    audio_file = models.FileField(
+        upload_to="audio_demos/",
+        validators=[FileExtensionValidator(allowed_extensions=["mp3", "wav", "ogg"])]
+    )
+
+    # setting up key for which plugin this belongs to
+    pro_plugin = models.ForeignKey(
+        "ProPlugin",
+        on_delete = models.CASCADE,
+        related_name = "audio_demos",
+        null=True,
+        blank=True,
+    )
+
+    alt_plugin = models.ForeignKey(
+        "AlternativePlugin",
+        on_delete = models.CASCADE,
+        null=True,
+        blank=True,
+    )
+
+    def __str__(self):
+        return self.title or self.audio_file.name
