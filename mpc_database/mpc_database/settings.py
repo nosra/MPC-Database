@@ -91,6 +91,7 @@ WSGI_APPLICATION = 'mpc_database.wsgi.application'
 TAILWIND_APP_NAME = 'theme'
 
 LOGIN_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = 'home'
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases

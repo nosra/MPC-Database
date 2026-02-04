@@ -10,9 +10,7 @@ from .forms import StaffPluginSubmission
 from django.contrib import messages
 
 def home(request):
-    template = loader.get_template('home.html')
-    return HttpResponse(template.render())
-
+    return render(request, 'home.html')
 # ---------
 # plugins routers
 # ---------
