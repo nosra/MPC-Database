@@ -50,6 +50,9 @@ class AlternativePlugin(models.Model):
     
     # using django's imagefield to upload an image
     image = models.ImageField(upload_to="plugin_images/", null=True, blank=True)
+
+    # ratings system, to be modified by users
+    rating = models.DecimalField(max_digits=3, decimal_places=2, default=0.00)
     
     # fallback for no image
     @property
@@ -75,6 +78,9 @@ class ProPlugin(models.Model):
     
     # using django's imagefield to upload an image
     image = models.ImageField(upload_to="plugin_images/", null=True, blank=True)
+    
+    # ratings system, to be modified by users
+    rating = models.DecimalField(max_digits=3, decimal_places=2, default=0.00)
     
     # fallback for no image
     @property

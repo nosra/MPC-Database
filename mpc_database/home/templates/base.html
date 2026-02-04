@@ -30,14 +30,30 @@
             </label>
         </a>
         -->
-
+        {% if user.is_authenticated and user.is_staff %}
         <a href="{% url 'staff_dashboard' %}" class="navbutton transition duration-200 hover:text-[#FFB81C]">
-            <label class="text-xl animated-underline">
-                Submissions
+            <label class="text-xl animated-underline cursor-pointer">
+                Staff Dashboard
             </label>
         </a>
+        {% endif %}
 
-        
+        {% if user.is_authenticated %}
+        <form action="{% url 'logout' %}" method="post" class="inline">
+            {% csrf_token %}
+            <button type="submit" class="navbutton transition duration-200 hover:text-[#FFB81C]">
+                <label class="text-xl animated-underline cursor-pointer">
+                    Logout
+                </label>
+            </button>
+        </form>
+        {% else %}
+        <a href="{% url 'login' %}" class="navbutton transition duration-200 hover:text-[#FFB81C]">
+            <label class="text-xl animated-underline cursor-pointer">
+                Login
+            </label>
+        </a>
+        {% endif %}
     </div>
     <main class="grow">
     {% block content %}
