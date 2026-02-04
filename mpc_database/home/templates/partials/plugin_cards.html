@@ -36,9 +36,22 @@
                         </label>
                     </div>
 
-                    <label class="text-lg font-semibold mt-1">
+                    <label class="text-lg font-semibold">
                         {{ plugin.name }}
                     </label>
+
+                    <!-- rating -->
+                    <div class="rating rating-md rating-half">
+                        {% widthratio plugin.rating 1 2 as rating_pos %}
+                        {% for i in "1111111111" %}
+                            <input type="radio" 
+                                name="rating-{{ plugin.id }}" 
+                                class="mask mask-star bg-white {% cycle 'mask-half-1' 'mask-half-2' %}" 
+                                {% if rating_pos|add:"0" == forloop.counter %}checked{% endif %}
+                                disabled 
+                                style="cursor: default;" />
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
         </div>

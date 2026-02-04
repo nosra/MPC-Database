@@ -71,17 +71,18 @@ def alt_plugin_detail(request, pk):
     plugin = get_object_or_404(AlternativePlugin, pk=pk)
     return render(request, 'alt_plugin_detail.html', {"plugin": plugin})
 
+
+# ---------
+# user routers
+# ---------
+
 # ---------
 # submissions routers
 # ---------
 def staff_check(user):
-    return user.is_staff
+    return user.is_authenticated and user.is_staff
 
-# handled by logout view (built in class)
-def staff_logout(user):
-    pass
-
-@user_passes_test(staff_check, login_url="staff_login")
+@user_passes_test(staff_check, login_url="login")
 def staff_dashboard(request):
     # post requests here will refer to adding a new plugin
     if request.method == "POST":
