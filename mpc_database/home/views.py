@@ -1,13 +1,18 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, JsonResponse
 from django.template import loader
-from django.db.models import Q
+from django.db.models import Q, Avg
 from django.urls import reverse
-from .models import ProPlugin, AlternativePlugin, CATEGORIES
-from django.contrib.auth import authenticate
-from django.contrib.auth.decorators import user_passes_test
-from .forms import StaffPluginSubmission
 from django.contrib import messages
+from django.contrib.auth import authenticate
+from django.contrib.auth.decorators import user_passes_test, login_required
+from django.views.decorators.http import require_POST
+from django.contrib.contenttypes.models import ContentType
+
+from .models import ProPlugin, AlternativePlugin, CATEGORIES, Rating
+from .forms import StaffPluginSubmission
+
+import json
 
 def home(request):
     return render(request, 'home.html')
@@ -62,17 +67,95 @@ def plugins(request):
 
 def plugin_detail(request, pk):
     plugin = get_object_or_404(ProPlugin, pk=pk)
-    return render(request, "plugin_detail.html", {"plugin": plugin})
+    
+    # check if user has already rated this
+    user_rating = 0
+    if request.user.is_authenticated:
+        rating_obj = Rating.objects.filter(
+            user=request.user,
+            content_type=ContentType.objects.get_for_model(plugin),
+            object_id=plugin.id
+        ).first()
+        if rating_obj:
+            user_rating = rating_obj.score
+
+    context = {
+        "plugin": plugin,
+        "user_rating": user_rating,
+        "plugin_type": "pro" # helper for the JS fetch URL
+    }
+    return render(request, "plugin_detail.html", context)
 
 
 def alt_plugin_detail(request, pk):
     plugin = get_object_or_404(AlternativePlugin, pk=pk)
-    return render(request, 'alt_plugin_detail.html', {"plugin": plugin})
+
+    # check if user has already rated this
+    user_rating = 0
+    if request.user.is_authenticated:
+        rating_obj = Rating.objects.filter(
+            user=request.user,
+            content_type=ContentType.objects.get_for_model(plugin),
+            object_id=plugin.id
+        ).first()
+        if rating_obj:
+            user_rating = rating_obj.score
+
+    context = {
+        "plugin": plugin,
+        "user_rating": user_rating,
+        "plugin_type": "alt" 
+    }
+    return render(request, 'alt_plugin_detail.html', context)
+
+# ---------
+# rating logic
+# ---------
+
+@login_required
+@require_POST
+def rate_plugin(request, plugin_type, plugin_id):
+    # parsing the json
+    try:
+        data = json.loads(request.body)
+        score = float(data.get('score'))
+    except (ValueError, TypeError):
+        return JsonResponse({'error': 'Invalid score'}, status=400)
+
+    if score < 0.5 or score > 5.0:
+        return JsonResponse({'error': 'Score must be between 1 and 5'}, status=400)
+
+    # resolving model
+    if plugin_type == 'pro':
+        model_class = ProPlugin
+    elif plugin_type == 'alt':
+        model_class = AlternativePlugin
+    else:
+        return JsonResponse({'error': 'Invalid plugin type'}, status=400)
+
+    plugin = get_object_or_404(model_class, pk=plugin_id)
+
+    # create or update rating
+    Rating.objects.update_or_create(
+        user=request.user,
+        content_type=ContentType.objects.get_for_model(plugin),
+        object_id=plugin.id,
+        defaults={'score': score}
+    )
+
+    # recalculate average on the model 
+    if hasattr(plugin, 'calculate_average_rating'):
+        plugin.calculate_average_rating()
+    
+    return JsonResponse({'success': True, 'new_average': plugin.rating})
 
 
 # ---------
 # user routers
 # ---------
+
+def profile(request):
+    return render(request, 'profile.html')
 
 # ---------
 # submissions routers
@@ -123,7 +206,7 @@ def search_plugins(request):
     results = []
 
     if len(query) > 1:
-        # search free Alternatives
+        # search free alternatives
         alts = AlternativePlugin.objects.filter(name__icontains=query)[:3] # only going up to 3 plugins
         for item in alts:
             results.append({
@@ -134,7 +217,7 @@ def search_plugins(request):
                 'url': reverse('alt_plugin_detail', args=[item.pk]) 
             })
 
-        # search Pro Plugins
+        # search pro plugins
         pros = ProPlugin.objects.filter(name__icontains=query)[:3]
         for item in pros:
             results.append({

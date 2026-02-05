@@ -2,7 +2,10 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.templatetags.static import static
 from django.core.files.storage import default_storage
-from django.core.validators import FileExtensionValidator
+from django.core.validators import FileExtensionValidator, MinValueValidator, MaxValueValidator
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
+from django.db.models import Avg
 
 # -----------------------
 # USERS
@@ -24,6 +27,22 @@ class CustomUser(AbstractUser):
         return self.username
 
 # -----------------------
+# RATINGS
+# -----------------------
+
+class Rating(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    # changing this to FloatField to support 0.5, 1.5, etc.
+    score = models.FloatField(validators=[MinValueValidator(0.5), MaxValueValidator(5.0)])
+    
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
+
+    class Meta:
+        unique_together = ('user', 'content_type', 'object_id')
+
+# -----------------------
 # PLUGINS
 # -----------------------
 
@@ -35,8 +54,23 @@ CATEGORIES = [
     ("DAW", "Digital Audio Workstation"),
 ]
 
+class RatingMixin:
+    def calculate_average_rating(self):
+        # get all ratings for this specific object
+        ratings = Rating.objects.filter(
+            content_type=ContentType.objects.get_for_model(self),
+            object_id=self.id
+        )
+        # calculate average
+        aggregate = ratings.aggregate(Avg('score'))
+        new_rating = aggregate['score__avg'] or 0.0
+        
+        # update the field on the model
+        self.rating = new_rating
+        self.save()
+
 # an alternative plugin can be an alternative to many pro plugins, and a pro plugin can have many alternatives
-class AlternativePlugin(models.Model):
+class AlternativePlugin(models.Model, RatingMixin):
     submitter = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=30)
     # Always use DateField with a datetime.date instance.
@@ -63,7 +97,7 @@ class AlternativePlugin(models.Model):
         return static("plugins/default-plugin.jpg")
 
 
-class ProPlugin(models.Model):
+class ProPlugin(models.Model, RatingMixin):
     submitter = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=30)
     # Always use DateField with a datetime.date instance.
