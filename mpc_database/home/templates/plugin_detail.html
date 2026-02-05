@@ -42,7 +42,7 @@
                         {{ plugin.name }}
                     </h1>
                 </div>
-
+                
                 <!-- right: glass info panel -->
                 <div class="w-full md:w-72 bg-black/35 backdrop-blur-md rounded-2xl p-4 md:p-5 shadow-lg border border-white/10 space-y-3">
                     <div class="flex items-baseline justify-between">
@@ -70,6 +70,115 @@
                             {{ plugin.size }} MB
                         </p>
                     </div>
+
+                    <!-- RATINGS section -->
+                    <div class="flex flex-col gap-2">
+                        <div class="flex items-center gap-3">
+                            
+                            <div class="rating rating-lg rating-half" id="star-container"
+                                data-plugin-type="{% if plugin.alternatives %}pro{% else %}alt{% endif %}" 
+                                data-plugin-id="{{ plugin.id }}">
+                                
+                                <input type="radio" name="rating-10" class="rating-hidden" />
+
+                                {% with user_rating|default:plugin.rating|default:0 as display_rating %}
+                                    
+                                    {% widthratio display_rating 1 2 as rating_doubled %}
+                                    
+                                    {% for i in "1234567890"|make_list %} 
+                                        {% with forloop.counter as i %}
+                                        
+                                        <input type="radio" 
+                                            name="rating-10" 
+                                            class="mask mask-star bg-white star-input {% if i|divisibleby:2 %}mask-half-2{% else %}mask-half-1{% endif %}"
+                                            /* calculate value (1=0.5, 2=1.0...) using widthratio */
+                                            value="{% widthratio i 2 1 %}{% if not i|divisibleby:2 %}.5{% endif %}"
+                                            {% if not user.is_authenticated %}disabled{% endif %}
+                                            /* compare loop index against the calculated rating */
+                                            {% if rating_doubled == i|stringformat:"s" %}checked{% endif %} />
+                                            
+                                        {% endwith %}
+                                    {% endfor %}
+                                
+                                {% endwith %}
+                            </div>
+
+                            <span class="text-lg font-bold text-white" id="rating-text">
+                                {{ plugin.rating|stringformat:".1f" }}
+                            </span>
+                        </div>
+
+                        <span class="text-xs text-gray-300">
+                            {% if user.is_authenticated %}
+                                {% if user_rating > 0 %}
+                                    You rated: <span id="user-score">{{ user_rating }}</span>
+                                {% else %}
+                                    Click stars to rate
+                                {% endif %}
+                            {% else %}
+                                Log in to rate
+                            {% endif %}
+                        </span>
+                    </div>
+
+                    <script>
+                    document.addEventListener("DOMContentLoaded", function () {
+                        const container = document.getElementById("star-container");
+                        const inputs = container.querySelectorAll(".star-input");
+                        const ratingText = document.getElementById("rating-text");
+                        const userScoreText = document.getElementById("user-score");
+
+                        const pluginType = container.dataset.pluginType;
+                        const pluginId = container.dataset.pluginId;
+                        const isAuthenticated = "{{ user.is_authenticated|yesno:'true,false' }}" === "true";
+
+                        if (isAuthenticated) {
+                            inputs.forEach(input => {
+                                input.addEventListener("change", function() {
+                                                                        
+                                    // simple way in JS: get the index of the clicked input
+                                    const index = Array.from(inputs).indexOf(this) + 1;
+                                    const score = index * 0.5;
+
+                                    submitRating(score);
+                                });
+                            });
+                        }
+
+                        function submitRating(score) {
+                            const url = `/rate/${pluginType}/${pluginId}/`;
+
+                            fetch(url, {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "X-CSRFToken": "{{ csrf_token }}"
+                                },
+                                body: JSON.stringify({ score: score })
+                            })
+                            .then(response => {
+                                if (!response.ok) throw new Error("Network response was not ok");
+                                return response.json();
+                            })
+                            .then(data => {
+                                if (data.success) {
+                                    // updating the averaage display 
+                                    ratingText.innerText = parseFloat(data.new_average).toFixed(1);
+                                    
+                                    // updated "you rated" text if it exists
+                                    if(userScoreText) {
+                                        userScoreText.innerText = score;
+                                    } else {
+                                        // if the text was "Click stars to rate", change it
+                                        const statusSpan = container.parentElement.querySelector(".text-gray-300");
+                                        statusSpan.innerHTML = `You rated: <span id="user-score">${score}</span>`;
+                                    }
+                                }
+                            })
+                            .catch(error => console.error("Error:", error));
+                        }
+                    });
+                    </script> 
 
                     <div class="pt-2">
                         <a href="{{ plugin.download_link }}"
