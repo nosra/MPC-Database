@@ -1,8 +1,7 @@
 # home/forms.py
 from django import forms
 from django.contrib.auth.forms import AdminUserCreationForm, UserChangeForm, AuthenticationForm
-from .models import CustomUser
-from .models import ProPlugin
+from .models import CustomUser, Category, ProPlugin, Subcategory
 
 class CustomUserCreationForm(AdminUserCreationForm):
     class Meta:
@@ -24,13 +23,6 @@ PLUGIN_TYPES = [
     ("ALT", "Alternative plugin"),
 ]
 
-CATEGORIES = [
-    ("EFX", "Effect"),
-    ("SYN", "Synth"),
-    ("CMP", "Compressor"),
-    ("DST", "Distorter"),
-    ("DAW", "Digital Audio Workstation"),
-]
 
 class StaffPluginSubmission(forms.Form):
     plugin_type = forms.ChoiceField(choices=PLUGIN_TYPES, label="Plugin type")
@@ -40,7 +32,11 @@ class StaffPluginSubmission(forms.Form):
         label="Date released",
         widget=forms.DateInput(attrs={"type": "date"})
     )
-    category = forms.ChoiceField(choices=CATEGORIES, label="Category")
+    subcategory = forms.ModelChoiceField(
+        queryset=Subcategory.objects.all().order_by('parent__name', 'name'),
+        label="Subcategory",
+        empty_label="Select a Subcategory"
+    )
     price = forms.IntegerField(label="Price (USD)")
     description = forms.CharField(label="Description", widget=forms.Textarea(attrs={"rows": "5"}))
     size = forms.DecimalField(label="Size (MB)", max_digits=5, decimal_places=2)

@@ -5,7 +5,7 @@
 {% block content %}
 <!-- getting rid of borders for now -->
 <div class="window flex min-h-dvh w-full border-[#004F99]">
-    <div class="plugin">
+    <div class="plugin w-60 shrink-0">
         <div class="plugin__categories flex flex-col sticky top-0 text-left w-full border-[#004F99] pl-10 pr-10 pt-5 gap-y-3">
             <div class="flex flex-row w-full justify-center items-center">
                 <label class="category__title font-bold text-center">
@@ -39,7 +39,7 @@
                 </a>
             </div>
 
-            <!-- category pills -->
+            <!-- category pills (OUTDATED, do not uncomment)
             <a href="{% url 'plugins' %}?tab={{ active_tab }}&category=EFX"
             class="category__pill flex flex-row gap-2 items-center rounded-4xl pl-5 pr-15 pt-2 pb-2 p-2 transition-colors duration-200 cursor-pointer
                     {% if active_category == 'EFX' %} bg-[#004F99] text-white {% else %} hover:bg-[#004F99] {% endif %}">
@@ -84,6 +84,59 @@
                     DAW
                 </span>
             </a>
+            -->
+            <div class="flex flex-col gap-1 mt-4">
+                {% for category in categories %}
+                <details class="group" {% if category.slug == active_parent_slug %}open{% endif %}>
+                    <summary class="list-none flex items-center justify-between px-4 py-2 cursor-pointer rounded-xl transition-all duration-200
+                                    {% if category.slug == active_parent_slug %}
+                                        /* active Parent: white text, slight background tint */
+                                        text-white bg-white/10 font-bold
+                                    {% else %}
+                                        /* inactive: grey text, hover brightens */
+                                        text-slate-400 hover:text-white hover:bg-white/5
+                                    {% endif %}">
+                        
+                        <a href="{% url 'plugins' %}?tab={{ active_tab }}&category={{ category.slug }}{% if search_query %}&q={{ search_query|urlencode }}{% endif %}"
+                        class="flex items-center gap-3 grow h-full">
+                        
+                        {% if category.icon %}
+                                <img class="size-5 transition-opacity duration-200 {% if category.slug == active_parent_slug %}opacity-100{% else %}opacity-70 group-hover:opacity-100{% endif %}" 
+                                    src="{{ category.icon.url }}"/>
+                            {% endif %}
+                            
+                            <span>{{ category.name }}</span>
+                        </a>
+
+                        <div class="ml-2 flex h-5 w-5 items-center justify-center transform transition-transform duration-200 group-open:rotate-180 origin-center">
+                            <svg class="w-3 h-3 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                    </summary>
+
+                    <div class="flex flex-col pt-1 pb-2">
+                        {% for sub in category.subcategories.all %}
+                            <a href="{% url 'plugins' %}?tab={{ active_tab }}&category={{ sub.slug }}{% if search_query %}&q={{ search_query|urlencode }}{% endif %}"
+                            class="group flex items-center w-full pl-12 pr-4 py-2 text-sm rounded-lg transition-all duration-200 cursor-pointer border 
+                                    {% if active_category == sub.slug %} 
+                                        /* active: visible Blue Border */
+                                        bg-blue-600/20 text-blue-400 font-semibold border-blue-500
+                                    {% else %} 
+                                        /* inactive: transparent border (reserves space) */
+                                        text-slate-400 border-transparent hover:text-white hover:bg-white/10
+                                    {% endif %}">
+                                
+                                <span class="w-1.5 h-1.5 rounded-full mr-3 transition-colors duration-200
+                                            {% if active_category == sub.slug %} bg-blue-400 shadow-[0_0_8px_rgba(96,165,250,0.6)] {% else %} bg-slate-600 group-hover:bg-slate-400 {% endif %}">
+                                </span>
+                                {{ sub.name }}
+                            </a>
+                        {% endfor %}
+                    </div>
+                </details>
+                {% endfor %}
+            </div>
         </div>
     </div>
     <div class="plugin__view grow bg-white rounded-3xl mr-12">
@@ -187,6 +240,32 @@ document.addEventListener('DOMContentLoaded', function () {
             e.preventDefault();
             fetchPlugins(searchInput.value);
         });
+    }
+});
+
+// keeping correct category expanded if a subcategory is expanded
+document.addEventListener("DOMContentLoaded", function() {
+    // check if we have an active category slug in the URL or template context
+    const activeSlug = "{{ active_category }}"; 
+    
+    if (activeSlug) {
+        // try to find a subcategory link with this slug
+        const activeLink = document.querySelector(`.subcategory-link[data-slug="${activeSlug}"]`);
+        
+        if (activeLink) {
+            // if found, find its parent <details> tag and open it
+            const parentDetails = activeLink.closest('details');
+            if (parentDetails) {
+                parentDetails.open = true;
+            }
+        } else {
+            // if not found, it might be a main Category. 
+            // try to find the details with ID cat-slug
+            const mainDetails = document.getElementById(`cat-${activeSlug}`);
+            if (mainDetails) {
+                mainDetails.open = true;
+            }
+        }
     }
 });
 </script>
