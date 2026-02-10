@@ -23,7 +23,6 @@ PLUGIN_TYPES = [
     ("ALT", "Alternative plugin"),
 ]
 
-
 class StaffPluginSubmission(forms.Form):
     plugin_type = forms.ChoiceField(choices=PLUGIN_TYPES, label="Plugin type")
 
@@ -32,11 +31,12 @@ class StaffPluginSubmission(forms.Form):
         label="Date released",
         widget=forms.DateInput(attrs={"type": "date"})
     )
-    subcategory = forms.ModelChoiceField(
-        queryset=Subcategory.objects.all().order_by('parent__name', 'name'),
-        label="Subcategory",
-        empty_label="Select a Subcategory"
+
+    subcategory = forms.ModelMultipleChoiceField(
+        queryset=Subcategory.objects.select_related("parent").order_by("parent__name", "name"),
+        widget=forms.SelectMultiple()
     )
+
     price = forms.IntegerField(label="Price (USD)")
     description = forms.CharField(label="Description", widget=forms.Textarea(attrs={"rows": "5"}))
     size = forms.DecimalField(label="Size (MB)", max_digits=5, decimal_places=2)
@@ -80,6 +80,33 @@ class StaffPluginSubmission(forms.Form):
                 widget.attrs.setdefault("class", base + " resize-y")
             else:
                 widget.attrs.setdefault("class", base)
+
+        # subcategory 
+        subs = Subcategory.objects.select_related("parent").order_by("parent__name", "name")
+
+        # creating a new dictionary that is of the following structure
+        '''
+        {
+            "Effects": [
+                (3, "Chorus"),
+                (1, "Delay"),
+                (2, "Reverb"),
+            ],
+            "Dynamics": [
+                (4, "Compressor"),
+                (5, "Limiter"),
+            ]
+        }
+                
+        '''
+        grouped = {}
+        for sub in subs:
+            grouped.setdefault(sub.parent.name, []).append((sub.pk, sub.name))
+
+        self.fields["subcategory"].choices = [
+            (parent, choices) for parent, choices in grouped.items()
+        ]
+
 
         # file input styling stays the same
         self.fields["image"].widget.attrs.update({

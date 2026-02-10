@@ -12,7 +12,7 @@
                     Categories
                 </label>
             </div>
-            <!-- pro/alt pills  -->
+            <!-- pro/alt pills -->
             <div class="flex gap-2 justify-center pb-5">
                 <a
                     href="{% url 'plugins' %}?tab=pro{% if active_category %}&category={{ active_category }}{% endif %}{% if search_query %}&q={{ search_query|urlencode }}{% endif %}"

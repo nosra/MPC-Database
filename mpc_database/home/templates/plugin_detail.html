@@ -32,12 +32,25 @@
 
             <!-- content on top of image -->
             <div class="relative h-full flex flex-col md:flex-row md:items-end justify-end md:justify-between p-6 md:p-8 gap-4 text-white">
-                <!-- left: title + category -->
+                <!-- left: title + subcategory pills -->
                 <div class="space-y-2 max-w-xl">
-                    <span class="inline-flex items-center px-3 py-1 rounded-full bg-white/15 text-xs font-semibold uppercase tracking-wide">
-                        {{ plugin.get_category_display }}
-                    </span>
-
+                    <div class="flex flex-wrap gap-2">
+                    {% for sub in plugin.subcategories.all %}
+                        <a href="{% url 'plugins' %}?category={{ sub.slug }}"
+                        class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 text-xs font-semibold uppercase tracking-wide hover:bg-white/20 transition">
+                        <!--
+                        {% if sub.parent.icon %}
+                            <img src="{{ sub.parent.icon.url }}" alt="{{ sub.parent.name }}" class="w-4 h-4 object-contain"/>
+                        {% endif %}
+                        -->
+                        {{ sub.name }}
+                        </a>
+                    {% empty %}
+                        <span class="inline-flex items-center px-3 py-1 rounded-full bg-white/15 text-xs font-semibold uppercase tracking-wide">
+                        Uncategorized
+                        </span>
+                    {% endfor %}
+                    </div>
                     <h1 class="text-3xl md:text-4xl font-bold leading-tight drop-shadow-md">
                         {{ plugin.name }}
                     </h1>
@@ -58,8 +71,17 @@
 
                     <div class="space-y-1 text-xs text-gray-200">
                         <p>
-                            <span class="font-semibold text-white">Category:</span>
-                            {{ plugin.get_category_display }}
+                            <span class="font-semibold text-white">Categories:</span>
+                            <div class="flex gap-2 overflow-x-auto whitespace-nowrap max-w-full scrollbar-thin">
+                                {% for sub in plugin.subcategories.all %}
+                                    <a href="{% url 'plugins' %}?subcategory={{ sub.slug }}"
+                                    class="text-xs font-semibold px-2 py-0.5 rounded bg-white/10 hover:bg-white/20 shrink-0">
+                                        {{ sub.name }}
+                                    </a>
+                                {% empty %}
+                                    <span class="text-xs text-gray-200">Uncategorized</span>
+                                {% endfor %}
+                            </div>
                         </p>
                         <p>
                             <span class="font-semibold text-white">Released:</span>
@@ -91,10 +113,8 @@
                                         <input type="radio" 
                                             name="rating-10" 
                                             class="mask mask-star bg-white star-input {% if i|divisibleby:2 %}mask-half-2{% else %}mask-half-1{% endif %}"
-                                            /* calculate value (1=0.5, 2=1.0...) using widthratio */
                                             value="{% widthratio i 2 1 %}{% if not i|divisibleby:2 %}.5{% endif %}"
                                             {% if not user.is_authenticated %}disabled{% endif %}
-                                            /* compare loop index against the calculated rating */
                                             {% if rating_doubled == i|stringformat:"s" %}checked{% endif %} />
                                             
                                         {% endwith %}
@@ -328,7 +348,14 @@
                                         {{ alt.name }}
                                     </h3>
                                     <p class="text-xs text-slate-500 mb-1">
-                                        {{ alt.get_category_display }} • Released {{ alt.date_released|date:"Y" }}
+                                        {% for sub in alt.subcategories.all %}
+                                          <span class="text-xs font-semibold text-slate-600 px-2 py-0.5 rounded bg-slate-100">
+                                            {{ sub.name }}
+                                          </span>{% if not forloop.last %} {% endif %}
+                                        {% empty %}
+                                          <span class="text-xs text-slate-500">Uncategorized</span>
+                                        {% endfor %}
+                                        • Released {{ alt.date_released|date:"Y" }}
                                     </p>
                                     <p class="text-xs text-emerald-600 font-semibold mb-2">
                                         Free alternative
