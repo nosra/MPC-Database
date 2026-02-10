@@ -190,7 +190,7 @@ def staff_dashboard(request):
                 submitter=request.user,
                 name=data["plugin_name"],
                 date_released=data["date_released"],
-                category=data["category"],
+                subcategory=data["subcategory"],
                 price=data["price"],
                 description=data["description"],
                 size=data["size"],
