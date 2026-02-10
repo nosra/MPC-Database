@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import user_passes_test, login_required
 from django.views.decorators.http import require_POST
 from django.contrib.contenttypes.models import ContentType
 
-from .models import ProPlugin, AlternativePlugin, CATEGORIES, Rating
+from .models import ProPlugin, AlternativePlugin, CATEGORIES, Rating, Category, Subcategory
 from .forms import StaffPluginSubmission
 
 import json
@@ -22,8 +22,14 @@ def home(request):
 
 def plugins(request):
     tab = request.GET.get("tab", "pro")
-    category = request.GET.get("category")
     search_query = (request.GET.get("q") or "").strip()
+
+    # filter by slug field
+    active_category = request.GET.get('category')
+    categories = Category.objects.prefetch_related('subcategories').all()
+
+    # parent slug for highlighting, purely visual
+    active_parent_slug = None
 
     # figure out which list we're showing
     if tab == "alt":
@@ -34,13 +40,19 @@ def plugins(request):
         active_tab = "pro"
 
     # validate & apply category filter
-    valid_codes = dict(CATEGORIES).keys()  # {'EFX', 'SYN', ...}
-    if category in valid_codes:
-        plugins_qs = plugins_qs.filter(category=category)
-        active_category = category
-    else:
-        active_category = None # "All"
-
+    if active_category:
+        # is the active_category a parent
+        if Category.objects.filter(slug=active_category).exists():
+            active_parent_slug = active_category
+            plugins_qs = plugins_qs.filter(subcategory__parent__slug=active_category)
+            
+        # is it a subcategory?
+        else:
+            # find the subcategory object to get its parent
+            sub = Subcategory.objects.filter(slug=active_category).first()
+            if sub:
+                active_parent_slug = sub.parent.slug
+                plugins_qs = plugins_qs.filter(subcategory__slug=active_category)
     # apply search filter if there's a query
     if search_query:
         plugins_qs = plugins_qs.filter(
@@ -51,7 +63,9 @@ def plugins(request):
         )
 
     context = {
+        "active_parent_slug": active_parent_slug,
         "plugins": plugins_qs,
+        "categories": categories,
         "active_tab": active_tab,
         "active_category": active_category,
         "search_query": search_query,

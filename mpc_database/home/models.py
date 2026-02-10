@@ -43,6 +43,44 @@ class Rating(models.Model):
         unique_together = ('user', 'content_type', 'object_id')
 
 # -----------------------
+# CATEGORIES
+# -----------------------
+
+class Category(models.Model):
+    name = models.CharField(max_length=30)
+    slug = models.SlugField(max_length=10, unique=True)
+
+    # svg file
+    icon = models.FileField(upload_to="category_icons/", null=True, blank=True)
+
+    class Meta:
+        verbose_name_plural = "Categories"
+    
+    def __str__(self):
+        return self.name
+    
+    # fallback for no icon
+    @property
+    def icon_url(self):
+        if self.icon and default_storage.exists(self.icon.name):
+            return self.icon.url
+        return static("plugins/default-category.svg")
+    
+class Subcategory(models.Model):
+    parent = models.ForeignKey(Category, related_name="subcategories", on_delete=models.CASCADE)
+    name = models.CharField(max_length=30)
+    slug = models.SlugField(max_length=20)
+
+    class Meta:
+        verbose_name_plural = "Subcategories"
+        unique_together = ('parent', 'slug') # preventing duplicate slugs inside one category
+
+    def __str__(self):
+        # making the dropdown look like "Effects - Reverb"
+        return f"{self.parent.name} - {self.name}"
+
+
+# -----------------------
 # PLUGINS
 # -----------------------
 
@@ -75,7 +113,8 @@ class AlternativePlugin(models.Model, RatingMixin):
     name = models.CharField(max_length=30)
     # Always use DateField with a datetime.date instance.
     date_released = models.DateField()
-    category = models.CharField(max_length=3, choices=CATEGORIES)
+    subcategory = models.ForeignKey(Subcategory, on_delete=models.SET_NULL, null=True, related_name="alt_plugins")
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name="alt_plugins")
     price = models.IntegerField()
     description = models.TextField()
     # size of the plugin in MB, this will be converted to KB, MB, GB at the app level
@@ -95,14 +134,19 @@ class AlternativePlugin(models.Model, RatingMixin):
             return self.image.url
         # fallback to static default
         return static("plugins/default-plugin.jpg")
-
+    
+    # helper so {{ plugon.category.name }} is still functional
+    @property
+    def category(self):
+        return self.subcategory.parent if self.subcategory else None
 
 class ProPlugin(models.Model, RatingMixin):
     submitter = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=30)
     # Always use DateField with a datetime.date instance.
     date_released = models.DateField()
-    category = models.CharField(max_length=3, choices=CATEGORIES)
+    subcategory = models.ForeignKey(Subcategory, on_delete=models.SET_NULL, null=True, related_name="pro_plugins")
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name="pro_plugins")
     price = models.IntegerField()
     description = models.TextField()
     # size of the plugin in MB, this will be converted to KB, MB, GB at the app level
@@ -123,6 +167,10 @@ class ProPlugin(models.Model, RatingMixin):
             return self.image.url
         # fallback to static default
         return static("plugins/default-plugin.jpg")
+    
+    @property
+    def category(self):
+        return self.subcategory.parent if self.subcategory else None
     
     # mtm with pro plugin
     alternatives = models.ManyToManyField(AlternativePlugin, related_name="pro_plugins", blank=True)
