@@ -11,7 +11,7 @@ urlpatterns = [
     path("login/", auth_views.LoginView.as_view(template_name="login.html"),  name="login"),
     path("logout/", auth_views.LogoutView.as_view(next_page="home"), name="logout"),
     path("staff/dashboard/", views.staff_dashboard, name="staff_dashboard"),
-    path("profile/", views.profile, name="profile"), 
+    path("profile/", views.profile_view, name="profile"), 
     path("about/", views.about, name="about"),
     path('ajax/search/', views.search_plugins, name='ajax_search'),
     path('rate/<str:plugin_type>/<int:plugin_id>/', views.rate_plugin, name='rate_plugin'),

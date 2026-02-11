@@ -9,8 +9,8 @@ from django.contrib.auth.decorators import user_passes_test, login_required
 from django.views.decorators.http import require_POST
 from django.contrib.contenttypes.models import ContentType
 
-from .models import ProPlugin, AlternativePlugin, CATEGORIES, Rating, Category, Subcategory
-from .forms import StaffPluginSubmission
+from .models import ProPlugin, AlternativePlugin, CATEGORIES, Rating, Category, Subcategory, PluginSuggestion
+from .forms import StaffPluginSubmission, SuggestionForm
 
 import json
 
@@ -173,8 +173,29 @@ def rate_plugin(request, plugin_type, plugin_id):
 # user routers
 # ---------
 
-def profile(request):
-    return render(request, 'profile.html')
+@login_required
+def profile_view(request):
+    # Handle the form submission
+    if request.method == 'POST':
+        form = SuggestionForm(request.POST)
+        if form.is_valid():
+            suggestion = form.save(commit=False)
+            suggestion.submitter = request.user # Attach current user
+            suggestion.save()
+            return redirect('profile') # Redirect to same page to clear form
+    else:
+        form = SuggestionForm()
+
+    # Fetch user's history
+    user_suggestions = PluginSuggestion.objects.filter(
+        submitter=request.user
+    ).order_by('-date_suggested')
+
+    context = {
+        'form': form,
+        'user_suggestions': user_suggestions
+    }
+    return render(request, 'profile.html', context)
 
 # ---------
 # submissions routers
@@ -184,13 +205,19 @@ def staff_check(user):
 
 @user_passes_test(staff_check, login_url="login")
 def staff_dashboard(request):
-    # post requests here will refer to adding a new plugin
-    if request.method == "POST":
+    # handling rejecting a plugin
+    if request.method == "POST" and "reject_suggestion" in request.POST:
+        s_id = request.POST.get("suggestion_id")
+        PluginSuggestion.objects.filter(pk=s_id).update(status='REJECTED')
+        messages.info(request, "Suggestion rejected.")
+        return redirect("staff_dashboard")
+
+    # handling a plugin submission from a staff member
+    if request.method == "POST" and "submit_plugin" in request.POST:
         form = StaffPluginSubmission(request.POST, request.FILES)
         if form.is_valid():
             data = form.cleaned_data
 
-            # removed subcategory because its many to many now 
             common = dict(
                 submitter=request.user,
                 name=data["plugin_name"],
@@ -204,21 +231,30 @@ def staff_dashboard(request):
 
             if data["plugin_type"] == "PRO":
                 plugin = ProPlugin.objects.create(**common)
-                # assign ManyToMany AFTER creation
                 plugin.subcategories.set(data["subcategory"])
             else:
                 alt = AlternativePlugin.objects.create(**common)
-                # set subcategories for the alt plugin
                 alt.subcategories.set(data["subcategory"])
-                # link this alt to selected pro plugins (if any)
                 for pro in data.get("link_to_pro_plugins", []):
                     pro.alternatives.add(alt)
+            
+            # checking if the comes from a submission
+            sid = data.get("suggestion_id")
+            if sid:
+                PluginSuggestion.objects.filter(pk=sid).update(status='APPROVED')
 
-            messages.success(request, "Plugin submitted!")
+            messages.success(request, "Plugin submitted successfully!")
             return redirect("staff_dashboard")
     else:
         form = StaffPluginSubmission()
-    return render(request, "staff_dashboard.html", {"form": form})
+
+    # fetching peding suggestions from the UI
+    suggestions = PluginSuggestion.objects.filter(status='PENDING').order_by('date_suggested')
+
+    return render(request, "staff_dashboard.html", {
+        "form": form,
+        "suggestions": suggestions
+    })
 
 def about(request):
     return render(request, "about.html")

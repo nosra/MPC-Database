@@ -207,3 +207,34 @@ class AudioDemo(models.Model):
 
     def __str__(self):
         return self.title or self.audio_file.name
+
+# -----------
+# PLUGIN SUGGESTIONS
+# -----------
+
+class PluginSuggestion(models.Model):
+    PLUGIN_TYPES = [
+        ("PRO", "Pro Plugin (VST/DAW)"),
+        ("ALT", "Free/Alternative Plugin"),
+    ]
+    
+    STATUS_CHOICES = [
+        ("PENDING", "Pending Review"),
+        ("APPROVED", "Approved"),
+        ("REJECTED", "Rejected"),
+    ]
+
+    submitter = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    name = models.CharField(max_length=50)
+    suggested_type = models.CharField(max_length=3, choices=PLUGIN_TYPES, default="ALT")
+    
+    # making these less strict than the main models
+    link = models.URLField(help_text="Official website or download link")
+    description = models.TextField(blank=True)
+    
+    # track the status
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="PENDING")
+    date_suggested = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.name} ({self.get_status_display()})"
