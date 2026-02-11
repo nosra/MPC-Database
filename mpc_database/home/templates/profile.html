@@ -5,18 +5,13 @@
 
 {% block content %}
 <div class="min-h-dvh w-full bg-slate-50 py-10 px-4">
-  <div class="mx-auto w-full max-w-3xl">
+  <div class="mx-auto w-full max-w-3xl space-y-8">
+    
     <div class="overflow-hidden rounded-3xl bg-white shadow-xl border border-slate-200">
-
-      <!-- header -->
-      <div class="flex items-center justify-between gap-4 p-6 border-b border-slate-200">
+      <div class="flex items-center justify-between gap-4 p-6">
         <div class="flex items-center gap-4">
           {% if request.user.avatar %}
-            <img
-              src="{{ request.user.avatar.url }}"
-              class="h-12 w-12 rounded-full object-cover"
-              alt="Avatar"
-            />
+            <img src="{{ request.user.avatar.url }}" class="h-12 w-12 rounded-full object-cover" alt="Avatar"/>
           {% else %}
             <div class="h-12 w-12 rounded-full bg-slate-200 flex items-center justify-center font-semibold text-slate-700">
               {{ request.user.username|slice:":2"|upper }}
@@ -24,9 +19,8 @@
           {% endif %}
 
           <div class="leading-tight">
-            <p class="text-sm text-slate-500">User</p>
-            <h1 class="text-2xl font-semibold text-slate-900">Hello, {{ request.user.username }}</h1>
-            <p class="text-sm text-slate-600">bruh</p>
+            <p class="text-sm text-slate-500">User Profile</p>
+            <h1 class="text-2xl font-semibold text-slate-900">{{ request.user.username }}</h1>
           </div>
         </div>
 
@@ -38,6 +32,101 @@
         </form>
       </div>
     </div>
+
+    <div class="overflow-hidden rounded-3xl bg-white shadow-xl border border-slate-200">
+      <div class="border-b border-slate-200 bg-slate-50/50 p-6">
+        <h2 class="text-lg font-semibold text-slate-900">Suggest a Plugin</h2>
+        <p class="text-sm text-slate-500">Found a cool plugin? Let the staff know.</p>
+      </div>
+      
+      <div class="p-6">
+        <form method="post" class="space-y-5">
+          {% csrf_token %}
+          
+          {% if form.non_field_errors %}
+             <div class="rounded-xl bg-red-50 p-3 text-sm text-red-600 border border-red-100">
+               {{ form.non_field_errors }}
+             </div>
+          {% endif %}
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1">Plugin Name</label>
+              {{ form.name }}
+              {{ form.name.errors }}
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1">Type</label>
+              {{ form.suggested_type }}
+              {{ form.suggested_type.errors }}
+            </div>
+          </div>
+
+          <div>
+             <label class="block text-sm font-medium text-slate-700 mb-1">Download/Info Link</label>
+             {{ form.link }}
+             {{ form.link.errors }}
+          </div>
+
+          <div>
+             <label class="block text-sm font-medium text-slate-700 mb-1">Why should we add this?</label>
+             {{ form.description }}
+             {{ form.description.errors }}
+          </div>
+
+          <div class="flex justify-end">
+            <button type="submit" class="rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-slate-800 transition-colors">
+              Submit Suggestion
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    {% if user_suggestions %}
+    <div class="overflow-hidden rounded-3xl bg-white shadow-xl border border-slate-200">
+      <div class="border-b border-slate-200 p-6">
+        <h2 class="text-lg font-semibold text-slate-900">Your Suggestions</h2>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm text-slate-600">
+          <thead class="bg-slate-50 text-xs uppercase text-slate-500">
+            <tr>
+              <th class="px-6 py-3">Plugin</th>
+              <th class="px-6 py-3">Type</th>
+              <th class="px-6 py-3">Date</th>
+              <th class="px-6 py-3">Status</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            {% for item in user_suggestions %}
+            <tr class="hover:bg-slate-50/50">
+              <td class="px-6 py-4 font-medium text-slate-900">{{ item.name }}</td>
+              <td class="px-6 py-4">{{ item.get_suggested_type_display }}</td>
+              <td class="px-6 py-4">{{ item.date_suggested|date:"M d, Y" }}</td>
+              <td class="px-6 py-4">
+                {% if item.status == 'APPROVED' %}
+                  <span class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
+                    Approved
+                  </span>
+                {% elif item.status == 'REJECTED' %}
+                  <span class="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800">
+                    Rejected
+                  </span>
+                {% else %}
+                  <span class="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800">
+                    Pending
+                  </span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% endif %}
+
   </div>
 </div>
 {% endblock %}
