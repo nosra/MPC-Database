@@ -26,6 +26,9 @@ PLUGIN_TYPES = [
 class StaffPluginSubmission(forms.Form):
     plugin_type = forms.ChoiceField(choices=PLUGIN_TYPES, label="Plugin type")
 
+    # for plugin approvals. this is filled out upon selecting "use data"
+    suggestion_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
+
     plugin_name = forms.CharField(label="Plugin name", max_length=30)
     date_released = forms.DateField(
         label="Date released",
@@ -54,7 +57,6 @@ class StaffPluginSubmission(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
         self.fields["link_to_pro_plugins"].queryset = ProPlugin.objects.order_by("name")
 
         # tailwind for normal fields
@@ -107,7 +109,6 @@ class StaffPluginSubmission(forms.Form):
             (parent, choices) for parent, choices in grouped.items()
         ]
 
-
         # file input styling stays the same
         self.fields["image"].widget.attrs.update({
             "class": (
@@ -117,10 +118,6 @@ class StaffPluginSubmission(forms.Form):
                 "hover:file:bg-blue-500"
             )
         })
-
-        # for plugin approvals
-        suggestion_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
-
 
 # suggestions for users
 class SuggestionForm(forms.ModelForm):

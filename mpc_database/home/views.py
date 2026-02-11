@@ -175,18 +175,18 @@ def rate_plugin(request, plugin_type, plugin_id):
 
 @login_required
 def profile_view(request):
-    # Handle the form submission
+    # handle the form submission
     if request.method == 'POST':
         form = SuggestionForm(request.POST)
         if form.is_valid():
             suggestion = form.save(commit=False)
-            suggestion.submitter = request.user # Attach current user
+            suggestion.submitter = request.user # attach current user
             suggestion.save()
-            return redirect('profile') # Redirect to same page to clear form
+            return redirect('profile') # redirect to same page to clear form
     else:
         form = SuggestionForm()
 
-    # Fetch user's history
+    # fetch user's history
     user_suggestions = PluginSuggestion.objects.filter(
         submitter=request.user
     ).order_by('-date_suggested')
