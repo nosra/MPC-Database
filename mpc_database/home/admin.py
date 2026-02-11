@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
 from .forms import CustomUserCreationForm, CustomUserChangeForm
-from .models import CustomUser, ProPlugin, AlternativePlugin, AudioDemo, Category, Subcategory
+from .models import CustomUser, ProPlugin, AlternativePlugin, AudioDemo, Category, Subcategory, PluginSuggestion
 
 
 class CustomUserAdmin(UserAdmin):
@@ -33,3 +33,4 @@ admin.site.register(AlternativePlugin)
 admin.site.register(AudioDemo)
 admin.site.register(Category)
 admin.site.register(Subcategory)
+admin.site.register(PluginSuggestion)
