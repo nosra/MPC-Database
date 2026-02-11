@@ -113,8 +113,7 @@ class AlternativePlugin(models.Model, RatingMixin):
     name = models.CharField(max_length=30)
     # Always use DateField with a datetime.date instance.
     date_released = models.DateField()
-    subcategory = models.ForeignKey(Subcategory, on_delete=models.SET_NULL, null=True, related_name="alt_plugins")
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name="alt_plugins")
+    subcategories = models.ManyToManyField(Subcategory, related_name="alt_plugins", blank=True)
     price = models.IntegerField()
     description = models.TextField()
     # size of the plugin in MB, this will be converted to KB, MB, GB at the app level
@@ -137,16 +136,15 @@ class AlternativePlugin(models.Model, RatingMixin):
     
     # helper so {{ plugon.category.name }} is still functional
     @property
-    def category(self):
-        return self.subcategory.parent if self.subcategory else None
+    def categories(self):
+        return Category.objects.filter(subcategories__in=self.subcategories.all()).distinct()
 
 class ProPlugin(models.Model, RatingMixin):
     submitter = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=30)
     # Always use DateField with a datetime.date instance.
     date_released = models.DateField()
-    subcategory = models.ForeignKey(Subcategory, on_delete=models.SET_NULL, null=True, related_name="pro_plugins")
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name="pro_plugins")
+    subcategories = models.ManyToManyField(Subcategory, related_name="pro_plugins", blank=True)
     price = models.IntegerField()
     description = models.TextField()
     # size of the plugin in MB, this will be converted to KB, MB, GB at the app level
@@ -169,10 +167,10 @@ class ProPlugin(models.Model, RatingMixin):
         return static("plugins/default-plugin.jpg")
     
     @property
-    def category(self):
-        return self.subcategory.parent if self.subcategory else None
+    def categories(self):
+        return Category.objects.filter(subcategories__in=self.subcategories.all()).distinct()
     
-    # mtm with pro plugin
+   # mtm with pro plugin
     alternatives = models.ManyToManyField(AlternativePlugin, related_name="pro_plugins", blank=True)
 
     def __str__(self):

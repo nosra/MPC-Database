@@ -5,14 +5,14 @@
 {% block content %}
 <!-- getting rid of borders for now -->
 <div class="window flex min-h-dvh w-full border-[#004F99]">
-    <div class="plugin w-60 shrink-0">
+    <div class="plugin w-70 shrink-0">
         <div class="plugin__categories flex flex-col sticky top-0 text-left w-full border-[#004F99] pl-10 pr-10 pt-5 gap-y-3">
             <div class="flex flex-row w-full justify-center items-center">
                 <label class="category__title font-bold text-center">
                     Categories
                 </label>
             </div>
-            <!-- pro/alt pills  -->
+            <!-- pro/alt pills -->
             <div class="flex gap-2 justify-center pb-5">
                 <a
                     href="{% url 'plugins' %}?tab=pro{% if active_category %}&category={{ active_category }}{% endif %}{% if search_query %}&q={{ search_query|urlencode }}{% endif %}"

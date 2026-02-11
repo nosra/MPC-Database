@@ -1,0 +1,614 @@
+[
+{
+  "model": "home.category",
+  "pk": 3,
+  "fields": {
+    "name": "Effects",
+    "slug": "effects",
+    "icon": "category_icons/pedal-svgrepo-com_vN702Pf.svg"
+  }
+},
+{
+  "model": "home.category",
+  "pk": 4,
+  "fields": {
+    "name": "Dynamics",
+    "slug": "dynamics",
+    "icon": "category_icons/wave-pulse-svgrepo-com_pP7CNJr.svg"
+  }
+},
+{
+  "model": "home.category",
+  "pk": 5,
+  "fields": {
+    "name": "EQ & Filtering",
+    "slug": "eqfilt",
+    "icon": "category_icons/equalizer-svgrepo-com_kce0MDq.svg"
+  }
+},
+{
+  "model": "home.category",
+  "pk": 6,
+  "fields": {
+    "name": "Synths",
+    "slug": "synthesize",
+    "icon": "category_icons/keyboard-piano-synth-midi-vst-svgrepo-com_mfm97ek.svg"
+  }
+},
+{
+  "model": "home.category",
+  "pk": 7,
+  "fields": {
+    "name": "Sampling",
+    "slug": "sampling",
+    "icon": "category_icons/eyedropper-svgrepo-com.svg"
+  }
+},
+{
+  "model": "home.category",
+  "pk": 8,
+  "fields": {
+    "name": "Utilities",
+    "slug": "utilities",
+    "icon": "category_icons/gear-svgrepo-com.svg"
+  }
+},
+{
+  "model": "home.category",
+  "pk": 9,
+  "fields": {
+    "name": "Pitch & Time",
+    "slug": "pitchtime",
+    "icon": "category_icons/musical-note-svgrepo-com.svg"
+  }
+},
+{
+  "model": "home.category",
+  "pk": 10,
+  "fields": {
+    "name": "Creative FX",
+    "slug": "creativefx",
+    "icon": "category_icons/art-gallery-svgrepo-com.svg"
+  }
+},
+{
+  "model": "home.category",
+  "pk": 11,
+  "fields": {
+    "name": "Mastering",
+    "slug": "mastering",
+    "icon": "category_icons/headphone-5-svgrepo-com.svg"
+  }
+},
+{
+  "model": "home.category",
+  "pk": 12,
+  "fields": {
+    "name": "Instruments",
+    "slug": "instrument",
+    "icon": "category_icons/instrument-rchestra-harp-svgrepo-com.svg"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 3,
+  "fields": {
+    "parent": 3,
+    "name": "Reverb",
+    "slug": "reverb"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 4,
+  "fields": {
+    "parent": 3,
+    "name": "Delay",
+    "slug": "delay"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 5,
+  "fields": {
+    "parent": 3,
+    "name": "Chorus",
+    "slug": "chorus"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 6,
+  "fields": {
+    "parent": 3,
+    "name": "Flanger",
+    "slug": "flanger"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 7,
+  "fields": {
+    "parent": 3,
+    "name": "Phaser",
+    "slug": "phaser"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 8,
+  "fields": {
+    "parent": 3,
+    "name": "Distortion",
+    "slug": "distortion"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 9,
+  "fields": {
+    "parent": 3,
+    "name": "Saturation",
+    "slug": "saturation"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 10,
+  "fields": {
+    "parent": 3,
+    "name": "Bitcrusher",
+    "slug": "bitcrusher"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 11,
+  "fields": {
+    "parent": 3,
+    "name": "Tremolo",
+    "slug": "tremolo"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 12,
+  "fields": {
+    "parent": 3,
+    "name": "Stereo Imaging",
+    "slug": "stereo"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 13,
+  "fields": {
+    "parent": 4,
+    "name": "Compressor",
+    "slug": "compressor"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 14,
+  "fields": {
+    "parent": 4,
+    "name": "Limiter",
+    "slug": "limiter"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 15,
+  "fields": {
+    "parent": 4,
+    "name": "Gate",
+    "slug": "gate"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 16,
+  "fields": {
+    "parent": 4,
+    "name": "Transient Shaper",
+    "slug": "transient"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 17,
+  "fields": {
+    "parent": 4,
+    "name": "De-esser",
+    "slug": "deesser"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 18,
+  "fields": {
+    "parent": 4,
+    "name": "Multiband Compressor",
+    "slug": "multiband"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 19,
+  "fields": {
+    "parent": 5,
+    "name": "Parametric EQ",
+    "slug": "peq"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 20,
+  "fields": {
+    "parent": 5,
+    "name": "Graphic EQ",
+    "slug": "geq"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 21,
+  "fields": {
+    "parent": 5,
+    "name": "Dynamic EQ",
+    "slug": "deq"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 22,
+  "fields": {
+    "parent": 5,
+    "name": "High/Low Pass Filter",
+    "slug": "filters"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 23,
+  "fields": {
+    "parent": 5,
+    "name": "Resonant Filter",
+    "slug": "resfilter"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 24,
+  "fields": {
+    "parent": 6,
+    "name": "Analog Modeling",
+    "slug": "analog"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 25,
+  "fields": {
+    "parent": 6,
+    "name": "FM Synth",
+    "slug": "fm"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 26,
+  "fields": {
+    "parent": 6,
+    "name": "Wavetable",
+    "slug": "wavetable"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 27,
+  "fields": {
+    "parent": 6,
+    "name": "Granular",
+    "slug": "granular"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 28,
+  "fields": {
+    "parent": 6,
+    "name": "Additive",
+    "slug": "additive"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 29,
+  "fields": {
+    "parent": 6,
+    "name": "Subtractive",
+    "slug": "subtractive"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 30,
+  "fields": {
+    "parent": 6,
+    "name": "Modular",
+    "slug": "modular"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 31,
+  "fields": {
+    "parent": 7,
+    "name": "Sampler",
+    "slug": "sampler"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 32,
+  "fields": {
+    "parent": 7,
+    "name": "Drum Sampler",
+    "slug": "drumsampler"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 33,
+  "fields": {
+    "parent": 7,
+    "name": "Loop Player",
+    "slug": "loopplayer"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 34,
+  "fields": {
+    "parent": 7,
+    "name": "Rompler",
+    "slug": "rompler"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 35,
+  "fields": {
+    "parent": 8,
+    "name": "Spectrum Analyzer",
+    "slug": "analyzer"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 36,
+  "fields": {
+    "parent": 8,
+    "name": "Metering",
+    "slug": "metering"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 37,
+  "fields": {
+    "parent": 8,
+    "name": "Tuner",
+    "slug": "tuner"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 38,
+  "fields": {
+    "parent": 8,
+    "name": "MIDI Utility",
+    "slug": "midiutil"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 39,
+  "fields": {
+    "parent": 8,
+    "name": "Gain/Volume",
+    "slug": "gain"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 40,
+  "fields": {
+    "parent": 8,
+    "name": "Phase Alignment",
+    "slug": "phase"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 41,
+  "fields": {
+    "parent": 9,
+    "name": "Pitch Correction",
+    "slug": "pitchcorr"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 42,
+  "fields": {
+    "parent": 9,
+    "name": "Pitch Shifter",
+    "slug": "pitchshift"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 43,
+  "fields": {
+    "parent": 9,
+    "name": "Time Stretching",
+    "slug": "timestretch"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 44,
+  "fields": {
+    "parent": 9,
+    "name": "Harmonizer",
+    "slug": "harmonizer"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 45,
+  "fields": {
+    "parent": 10,
+    "name": "Glitch",
+    "slug": "glitch"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 46,
+  "fields": {
+    "parent": 10,
+    "name": "Reverse",
+    "slug": "reverse"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 47,
+  "fields": {
+    "parent": 10,
+    "name": "Looper",
+    "slug": "looper"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 48,
+  "fields": {
+    "parent": 10,
+    "name": "Granular FX",
+    "slug": "granfx"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 49,
+  "fields": {
+    "parent": 10,
+    "name": "Stutter",
+    "slug": "stutter"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 50,
+  "fields": {
+    "parent": 11,
+    "name": "Mastering Suite",
+    "slug": "mastersuite"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 51,
+  "fields": {
+    "parent": 11,
+    "name": "Exciter",
+    "slug": "exciter"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 52,
+  "fields": {
+    "parent": 11,
+    "name": "Stereo Enhancer",
+    "slug": "stereoenh"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 53,
+  "fields": {
+    "parent": 11,
+    "name": "Loudness Meter",
+    "slug": "loudmeter"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 54,
+  "fields": {
+    "parent": 12,
+    "name": "Piano",
+    "slug": "piano"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 55,
+  "fields": {
+    "parent": 12,
+    "name": "Strings",
+    "slug": "strings"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 56,
+  "fields": {
+    "parent": 12,
+    "name": "Brass",
+    "slug": "brass"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 57,
+  "fields": {
+    "parent": 12,
+    "name": "Guitar",
+    "slug": "guitar"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 58,
+  "fields": {
+    "parent": 12,
+    "name": "Bass",
+    "slug": "bass"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 59,
+  "fields": {
+    "parent": 12,
+    "name": "Drums",
+    "slug": "drums"
+  }
+},
+{
+  "model": "home.subcategory",
+  "pk": 60,
+  "fields": {
+    "parent": 12,
+    "name": "Orchestral",
+    "slug": "orchestral"
+  }
+}
+]

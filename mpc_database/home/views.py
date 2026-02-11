@@ -41,18 +41,23 @@ def plugins(request):
 
     # validate & apply category filter
     if active_category:
-        # is the active_category a parent
+        # is the active_category a parent category slug?
         if Category.objects.filter(slug=active_category).exists():
             active_parent_slug = active_category
-            plugins_qs = plugins_qs.filter(subcategory__parent__slug=active_category)
-            
-        # is it a subcategory?
+            plugins_qs = plugins_qs.filter(
+                subcategories__parent__slug=active_category
+            ).distinct()
+
+        # otherwise it's a subcategory slug
         else:
-            # find the subcategory object to get its parent
             sub = Subcategory.objects.filter(slug=active_category).first()
             if sub:
                 active_parent_slug = sub.parent.slug
-                plugins_qs = plugins_qs.filter(subcategory__slug=active_category)
+                plugins_qs = plugins_qs.filter(
+                    subcategories__slug=active_category
+                ).distinct()
+
+
     # apply search filter if there's a query
     if search_query:
         plugins_qs = plugins_qs.filter(
@@ -181,16 +186,15 @@ def staff_check(user):
 def staff_dashboard(request):
     # post requests here will refer to adding a new plugin
     if request.method == "POST":
-        # create a form instance, populate it with the data from the request
         form = StaffPluginSubmission(request.POST, request.FILES)
         if form.is_valid():
             data = form.cleaned_data
 
+            # removed subcategory because its many to many now 
             common = dict(
                 submitter=request.user,
                 name=data["plugin_name"],
                 date_released=data["date_released"],
-                subcategory=data["subcategory"],
                 price=data["price"],
                 description=data["description"],
                 size=data["size"],
@@ -199,15 +203,19 @@ def staff_dashboard(request):
             )
 
             if data["plugin_type"] == "PRO":
-                ProPlugin.objects.create(**common)
+                plugin = ProPlugin.objects.create(**common)
+                # assign ManyToMany AFTER creation
+                plugin.subcategories.set(data["subcategory"])
             else:
                 alt = AlternativePlugin.objects.create(**common)
-                for pro in data["link_to_pro_plugins"]:
+                # set subcategories for the alt plugin
+                alt.subcategories.set(data["subcategory"])
+                # link this alt to selected pro plugins (if any)
+                for pro in data.get("link_to_pro_plugins", []):
                     pro.alternatives.add(alt)
 
             messages.success(request, "Plugin submitted!")
             return redirect("staff_dashboard")
-        
     else:
         form = StaffPluginSubmission()
     return render(request, "staff_dashboard.html", {"form": form})
@@ -216,30 +224,36 @@ def about(request):
     return render(request, "about.html")
 
 def search_plugins(request):
-    query = request.GET.get('q', '')
+    query = (request.GET.get('q') or '').strip()
     results = []
 
     if len(query) > 1:
-        # search free alternatives
-        alts = AlternativePlugin.objects.filter(name__icontains=query)[:3] # only going up to 3 plugins
+        # limit + prefetch to avoid N+1 queries
+        alts = AlternativePlugin.objects.filter(name__icontains=query).prefetch_related('subcategories')[:3]
         for item in alts:
+            # build a readable category string from subcategories
+            sub_names = list(item.subcategories.order_by('parent__name', 'name').values_list('name', flat=True))
+            category_display = ", ".join(sub_names) if sub_names else "Uncategorized"
+
             results.append({
                 'name': item.name,
-                'category': item.get_category_display(),
+                'category': category_display,
                 'type': 'Free',
                 'image': item.image_url,
-                'url': reverse('alt_plugin_detail', args=[item.pk]) 
+                'url': reverse('alt_plugin_detail', args=[item.pk])
             })
 
-        # search pro plugins
-        pros = ProPlugin.objects.filter(name__icontains=query)[:3]
+        pros = ProPlugin.objects.filter(name__icontains=query).prefetch_related('subcategories')[:3]
         for item in pros:
+            sub_names = list(item.subcategories.order_by('parent__name', 'name').values_list('name', flat=True))
+            category_display = ", ".join(sub_names) if sub_names else "Uncategorized"
+
             results.append({
                 'name': item.name,
-                'category': item.get_category_display(),
+                'category': category_display,
                 'type': 'Pro/Paid',
                 'image': item.image_url,
-                'url': reverse('plugin_detail', args=[item.pk]) 
+                'url': reverse('plugin_detail', args=[item.pk])
             })
 
     return JsonResponse({'results': results})
