@@ -224,30 +224,36 @@ def about(request):
     return render(request, "about.html")
 
 def search_plugins(request):
-    query = request.GET.get('q', '')
+    query = (request.GET.get('q') or '').strip()
     results = []
 
     if len(query) > 1:
-        # search free alternatives
-        alts = AlternativePlugin.objects.filter(name__icontains=query)[:3] # only going up to 3 plugins
+        # limit + prefetch to avoid N+1 queries
+        alts = AlternativePlugin.objects.filter(name__icontains=query).prefetch_related('subcategories')[:3]
         for item in alts:
+            # build a readable category string from subcategories
+            sub_names = list(item.subcategories.order_by('parent__name', 'name').values_list('name', flat=True))
+            category_display = ", ".join(sub_names) if sub_names else "Uncategorized"
+
             results.append({
                 'name': item.name,
-                'category': item.get_category_display(),
+                'category': category_display,
                 'type': 'Free',
                 'image': item.image_url,
-                'url': reverse('alt_plugin_detail', args=[item.pk]) 
+                'url': reverse('alt_plugin_detail', args=[item.pk])
             })
 
-        # search pro plugins
-        pros = ProPlugin.objects.filter(name__icontains=query)[:3]
+        pros = ProPlugin.objects.filter(name__icontains=query).prefetch_related('subcategories')[:3]
         for item in pros:
+            sub_names = list(item.subcategories.order_by('parent__name', 'name').values_list('name', flat=True))
+            category_display = ", ".join(sub_names) if sub_names else "Uncategorized"
+
             results.append({
                 'name': item.name,
-                'category': item.get_category_display(),
+                'category': category_display,
                 'type': 'Pro/Paid',
                 'image': item.image_url,
-                'url': reverse('plugin_detail', args=[item.pk]) 
+                'url': reverse('plugin_detail', args=[item.pk])
             })
 
     return JsonResponse({'results': results})
