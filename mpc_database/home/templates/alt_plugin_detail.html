@@ -34,23 +34,28 @@
 
                 <!-- left: title + category + free badge -->
                 <div class="space-y-2 max-w-xl">
-                    <div class="flex flex-wrap items-center gap-2">
-                        <span class="inline-flex items-center px-3 py-1 rounded-full bg-white/15 text-xs font-semibold uppercase tracking-wide">
-                            {{ plugin.get_category_display }}
-                        </span>
-
-                        {% if plugin.price == 0 %}
-                            <span class="inline-flex items-center px-3 py-1 rounded-full bg-emerald-500/80 text-xs font-semibold text-white uppercase tracking-wide">
-                                Free alternative
-                            </span>
+                    <div class="flex flex-wrap gap-2">
+                    {% for sub in plugin.subcategories.all %}
+                        <a href="{% url 'plugins' %}?category={{ sub.slug }}"
+                        class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 text-xs font-semibold uppercase tracking-wide hover:bg-white/20 transition">
+                        <!--
+                        {% if sub.parent.icon %}
+                            <img src="{{ sub.parent.icon.url }}" alt="{{ sub.parent.name }}" class="w-4 h-4 object-contain"/>
                         {% endif %}
+                        -->
+                        {{ sub.name }}
+                        </a>
+                    {% empty %}
+                        <span class="inline-flex items-center px-3 py-1 rounded-full bg-white/15 text-xs font-semibold uppercase tracking-wide">
+                        Uncategorized
+                        </span>
+                    {% endfor %}
                     </div>
-
                     <h1 class="text-3xl md:text-4xl font-bold leading-tight drop-shadow-md">
                         {{ plugin.name }}
                     </h1>
                 </div>
-
+                
                 <!-- right: glass info panel -->
                 <div class="w-full md:w-72 bg-black/35 backdrop-blur-md rounded-2xl p-4 md:p-5 shadow-lg border border-white/10 space-y-3">
                     <div class="flex items-baseline justify-between">
@@ -73,8 +78,17 @@
 
                     <div class="space-y-1 text-xs text-gray-200">
                         <p>
-                            <span class="font-semibold text-white">Category:</span>
-                            {{ plugin.get_category_display }}
+                            <span class="font-semibold text-white">Categories:</span>
+                            <div class="flex gap-2 overflow-x-auto whitespace-nowrap max-w-full scrollbar-thin">
+                                {% for sub in plugin.subcategories.all %}
+                                    <a href="{% url 'plugins' %}?subcategory={{ sub.slug }}"
+                                    class="text-xs font-semibold px-2 py-0.5 rounded bg-white/10 hover:bg-white/20 shrink-0">
+                                        {{ sub.name }}
+                                    </a>
+                                {% empty %}
+                                    <span class="text-xs text-gray-200">Uncategorized</span>
+                                {% endfor %}
+                            </div>
                         </p>
                         <p>
                             <span class="font-semibold text-white">Released:</span>
@@ -85,7 +99,7 @@
                             {{ plugin.size }} MB
                         </p>
                     </div>
-                    
+
                     <!-- RATINGS section -->
                     <div class="flex flex-col gap-2">
                         <div class="flex items-center gap-3">
@@ -194,9 +208,6 @@
                         }
                     });
                     </script> 
-
-
-
                     <div class="pt-2">
                         <a href="{{ plugin.download_link }}"
                            target="_blank" rel="noopener noreferrer"
@@ -213,45 +224,100 @@
         <!-- divider -->
         <div class="border-t border-slate-200"></div>
 
-        <!-- description + submitter blurb -->
-        <div class="px-8 md:px-10 py-8 space-y-6">
-
-            <!-- heading -->
-            <div>
-                <h2 class="text-xl font-semibold text-slate-900 mb-2">
-                    About this alternative
-                </h2>
-                <p class="text-slate-700 leading-relaxed">
-                    {{ plugin.description }}
-                </p>
-            </div>
-
-            {% if plugin.submitter %}
-            <!-- submitter section -->
-            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-center gap-4">
-                {% if plugin.submitter.avatar %}
-                    <img
-                        src="{{ plugin.submitter.avatar.url }}"
-                        alt="{{ plugin.submitter.username }}"
-                        class="w-12 h-12 rounded-full object-cover"
-                    />
-                {% else %}
-                    <div class="w-12 h-12 rounded-full bg-slate-300 flex items-center justify-center text-sm font-semibold text-slate-700">
-                        {{ plugin.submitter.username|first|upper }}
+        <!-- desc + audio file stuff -->
+        <div class="px-8 md:px-10 py-8 space-y-6"> 
+        <div>
+            {% if plugin.audio_demos.exists %}
+            <div class="mb-10">
+                <div class="flex items-center gap-3 mb-6">
+                    <!-- play icon -->
+                    <div class="p-2 bg-[#a6cdf0] text-[#004F99] rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                        </svg>
                     </div>
-                {% endif %}
-
-                <div>
-                    <p class="text-sm font-semibold text-slate-900">
-                        Submitted by {{ plugin.submitter.username }}
-                    </p>
-                    <p class="text-xs text-slate-600 mt-0.5">
-                        This description reflects the submitter’s thoughts and experience with this alternative.
-                    </p>
+                    <h2 class="text-xl font-bold text-slate-900">Audio Demos</h2>
                 </div>
+
+                <!-- audio demos section-->
+                <div class="space-y-3">
+                    {% for demo in plugin.audio_demos.all %}
+                        <div class="group relative flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl hover:border-indigo-300 hover:shadow-md transition-all duration-200">
+                            <div class="flex items-center gap-4">
+                                <button 
+                                    class="demo-btn h-10 w-10 flex items-center justify-center rounded-full bg-slate-900 text-white shadow-sm group-hover:bg-[#FFB81C] group-hover:text-black transition-colors"
+                                    data-audio-id="audio-{{ demo.id }}"
+                                >
+                                    <svg class="play-icon w-4 h-4 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                    <svg class="stop-icon w-4 h-4 hidden" fill="currentColor" viewBox="0 0 24 24"><path d="M6 6h12v12H6z"/></svg>
+                                </button>
+
+                                <div class="flex flex-col">
+                                    <span class="font-semibold text-slate-800 text-sm md:text-base">
+                                        {{ demo.title|default:"Demo Track" }}
+                                    </span>
+                                    <span class="text-xs text-slate-500">Audio Preview</span>
+                                </div>
+                            </div>
+
+                            <!-- audio bars -->
+                            <div class="hidden md:flex items-center gap-1 opacity-50">
+                                <div class="w-1 h-3 bg-slate-400 rounded-full"></div>
+                                <div class="w-1 h-5 bg-slate-400 rounded-full"></div>
+                                <div class="w-1 h-4 bg-slate-400 rounded-full"></div>
+                                <div class="w-1 h-6 bg-slate-400 rounded-full"></div>
+                                <div class="w-1 h-3 bg-slate-400 rounded-full"></div>
+                            </div>
+                            <audio id="audio-{{ demo.id }}" src="{{ demo.audio_file.url }}"></audio>
+                        </div>
+                    {% endfor %}
+                </div>
+                
+                <div class="border-t border-slate-200 mt-10 mb-8"></div>
             </div>
             {% endif %}
+
+            <!-- "about" icon -->
+            <div class="flex items-center gap-3 mb-4">
+                <div class="p-2 bg-[#a6cdf0] text-[#004F99] rounded-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" />
+                    </svg>
+                </div>
+                <h2 class="text-xl font-bold text-slate-900">About this plugin</h2>
+            </div>
+
+            <p class="text-slate-700 leading-relaxed mb-6">
+                {{ plugin.description }}
+            </p>
         </div>
+
+        {% if plugin.submitter %}
+        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-center gap-4">
+            {% if plugin.submitter.avatar %}
+                <img
+                    src="{{ plugin.submitter.avatar.url }}"
+                    alt="{{ plugin.submitter.username }}"
+                    class="w-12 h-12 rounded-full object-cover shrink-0"
+                />
+            {% else %}
+                <div class="w-12 h-12 rounded-full bg-slate-300 flex items-center justify-center text-sm font-semibold text-slate-700">
+                    {{ plugin.submitter.username|first|upper }}
+                </div>
+            {% endif %}
+
+            <div>
+                <p class="text-sm font-semibold text-slate-900">
+                    Submitted by {{ plugin.submitter.username }}
+                </p>
+                <p class="text-xs text-slate-600 mt-0.5">
+                    This description reflects the submitter’s thoughts and experience.
+                </p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
 
         <!-- linked pro plugins -->
         {% if plugin.pro_plugins.all %}
