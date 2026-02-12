@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.templatetags.static import static
 from django.core.files.storage import default_storage
 from django.core.validators import FileExtensionValidator, MinValueValidator, MaxValueValidator
+from django.core.exceptions import ValidationError
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Avg
@@ -180,13 +181,23 @@ class ProPlugin(models.Model, RatingMixin):
 # AUDIO DEMOS 
 # -----------------------
 
+# restrict audio file size
+def validate_audio_size(value):
+    limit_mb = 10
+    if value.size > limit_mb * 1024 * 1024:
+        raise ValidationError(f"File too large. Size should not exceed {limit_mb} MB.")
+    
+
 class AudioDemo(models.Model):
     title = models.CharField(max_length=60, blank=True)
     
     # actual audio file
     audio_file = models.FileField(
         upload_to="audio_demos/",
-        validators=[FileExtensionValidator(allowed_extensions=["mp3", "wav", "ogg"])]
+        validators=[
+            FileExtensionValidator(allowed_extensions=["mp3", "wav", "ogg"]),
+            validate_audio_size
+        ]
     )
 
     # setting up key for which plugin this belongs to

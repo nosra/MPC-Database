@@ -1,7 +1,8 @@
 # home/forms.py
 from django import forms
 from django.contrib.auth.forms import AdminUserCreationForm, UserChangeForm, AuthenticationForm
-from .models import CustomUser, Category, ProPlugin, Subcategory, PluginSuggestion
+from django.core.validators import FileExtensionValidator
+from .models import CustomUser, Category, ProPlugin, Subcategory, PluginSuggestion, validate_audio_size
 
 class CustomUserCreationForm(AdminUserCreationForm):
     class Meta:
@@ -28,6 +29,28 @@ class StaffPluginSubmission(forms.Form):
 
     # for plugin approvals. this is filled out upon selecting "use data"
     suggestion_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
+
+    # for audio demo uploads
+    audio_demo_1 = forms.FileField(
+        label="Audio Demo 1", 
+        required=False,
+        validators=[FileExtensionValidator(allowed_extensions=["mp3", "wav", "ogg"]), validate_audio_size]
+    )
+    demo_title_1 = forms.CharField(label="Title 1", required=False, max_length=60)
+
+    audio_demo_2 = forms.FileField(
+        label="Audio Demo 2", 
+        required=False,
+        validators=[FileExtensionValidator(allowed_extensions=["mp3", "wav", "ogg"]), validate_audio_size]
+    )
+    demo_title_2 = forms.CharField(label="Title 2", required=False, max_length=60)
+
+    audio_demo_3 = forms.FileField(
+        label="Audio Demo 3", 
+        required=False,
+        validators=[FileExtensionValidator(allowed_extensions=["mp3", "wav", "ogg"]), validate_audio_size]
+    )
+    demo_title_3 = forms.CharField(label="Title 3", required=False, max_length=60)
 
     plugin_name = forms.CharField(label="Plugin name", max_length=30)
     date_released = forms.DateField(
@@ -70,6 +93,15 @@ class StaffPluginSubmission(forms.Form):
             widget = field.widget
 
             if isinstance(widget, (forms.FileInput, forms.ClearableFileInput)):
+                # specific file styling
+                widget.attrs.update({
+                    "class": (
+                        "block w-full text-sm text-slate-700 "
+                        "file:mr-4 file:rounded-xl file:border-0 "
+                        "file:bg-blue-600 file:px-4 file:py-2 file:text-white file:font-semibold "
+                        "hover:file:bg-blue-500"
+                    )
+                })
                 continue
 
             # not applying input styling to checkbox list container

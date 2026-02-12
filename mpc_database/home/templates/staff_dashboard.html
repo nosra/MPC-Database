@@ -165,7 +165,7 @@
             <label class="block text-sm font-medium text-slate-700 mb-1">{{ form.download_link.label }}</label>
             {{ form.download_link }}
             {% if form.download_link.errors %}<p class="mt-1 text-sm text-red-600">{{ form.download_link.errors|striptags }}</p>{% endif %}
-          </div>
+          </div> 
 
           <div>
             <label class="block text-sm font-medium text-slate-700 mb-2">{{ form.image.label }}</label>
@@ -173,6 +173,48 @@
             <p class="mt-2 text-xs text-slate-500">PNG/JPG recommended. Optional.</p>
           </div>
 
+          <div class="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+            <h3 class="mb-3 font-semibold text-slate-900">Audio Demos (Optional)</h3>
+            <p class="mb-4 text-xs text-slate-500">Upload up to 3 audio examples (mp3, wav, ogg).</p>
+            
+            <div class="space-y-4">
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-700 mb-1">File 1</label>
+                        {{ form.audio_demo_1 }}
+                        {% if form.audio_demo_1.errors %}<p class="mt-1 text-xs text-red-600">{{ form.audio_demo_1.errors|striptags }}</p>{% endif %}
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-700 mb-1">Title 1</label>
+                        {{ form.demo_title_1 }}
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-700 mb-1">File 2</label>
+                        {{ form.audio_demo_2 }}
+                        {% if form.audio_demo_2.errors %}<p class="mt-1 text-xs text-red-600">{{ form.audio_demo_2.errors|striptags }}</p>{% endif %}
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-700 mb-1">Title 2</label>
+                        {{ form.demo_title_2 }}
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-700 mb-1">File 3</label>
+                        {{ form.audio_demo_3 }}
+                        {% if form.audio_demo_3.errors %}<p class="mt-1 text-xs text-red-600">{{ form.audio_demo_3.errors|striptags }}</p>{% endif %}
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-700 mb-1">Title 3</label>
+                        {{ form.demo_title_3 }}
+                    </div>
+                </div>
+            </div>
+          </div>
           <div id="linkToProsWrap" class="mt-6">
              <div class="flex items-end justify-between gap-3">
                  <div>
@@ -198,6 +240,85 @@
       </div>
 
     </div>
+    <div class="border-t border-slate-200 bg-slate-50 p-6 mt-5">
+        <h2 class="mb-4 text-lg font-semibold text-slate-900">Your Submitted Plugins</h2>
+        
+        {% if not my_pro_plugins and not my_alt_plugins %}
+            <p class="text-sm text-slate-500 italic">You haven't submitted any plugins yet.</p>
+        {% else %}
+            <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+                <table class="min-w-full divide-y divide-slate-200">
+                    <thead class="bg-slate-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-500">Name</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-500">Type</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-500">Release Date</th>
+                            <th class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-slate-500">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200 bg-white">
+                        {% for p in my_pro_plugins %}
+                        <tr>
+                            <td class="whitespace-nowrap px-6 py-4">
+                                <div class="flex items-center">
+                                    <div class="h-8 w-8 flex-shrink-0">
+                                        <img class="h-8 w-8 rounded object-cover" src="{{ p.image_url }}" alt="">
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-slate-900">{{ p.name }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="whitespace-nowrap px-6 py-4">
+                                <span class="inline-flex rounded-full bg-blue-100 px-2 text-xs font-semibold leading-5 text-blue-800">PRO</span>
+                            </td>
+                            <td class="whitespace-nowrap px-6 py-4 text-sm text-slate-500">
+                                {{ p.date_released }}
+                            </td>
+                            <td class="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
+                                <form action="{% url 'delete_plugin' %}" method="POST" onsubmit="return confirm('Are you sure you want to delete {{ p.name }}? This cannot be undone.');">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="plugin_id" value="{{ p.id }}">
+                                    <input type="hidden" name="plugin_type" value="PRO">
+                                    <button type="submit" class="text-red-600 hover:text-red-900 font-semibold">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+
+                        {% for p in my_alt_plugins %}
+                        <tr>
+                            <td class="whitespace-nowrap px-6 py-4">
+                                <div class="flex items-center">
+                                    <div class="h-8 w-8 flex-shrink-0">
+                                        <img class="h-8 w-8 rounded object-cover" src="{{ p.image_url }}" alt="">
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-slate-900">{{ p.name }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="whitespace-nowrap px-6 py-4">
+                                <span class="inline-flex rounded-full bg-emerald-100 px-2 text-xs font-semibold leading-5 text-emerald-800">Free/Alt</span>
+                            </td>
+                            <td class="whitespace-nowrap px-6 py-4 text-sm text-slate-500">
+                                {{ p.date_released }}
+                            </td>
+                            <td class="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
+                                <form action="{% url 'delete_plugin' %}" method="POST" onsubmit="return confirm('Are you sure you want to delete {{ p.name }}? This cannot be undone.');">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="plugin_id" value="{{ p.id }}">
+                                    <input type="hidden" name="plugin_type" value="ALT">
+                                    <button type="submit" class="text-red-600 hover:text-red-900 font-semibold">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+      </div>
   </div>
 </div>
 

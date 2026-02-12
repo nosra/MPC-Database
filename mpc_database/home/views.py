@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import user_passes_test, login_required
 from django.views.decorators.http import require_POST
 from django.contrib.contenttypes.models import ContentType
 
-from .models import ProPlugin, AlternativePlugin, CATEGORIES, Rating, Category, Subcategory, PluginSuggestion
+from .models import ProPlugin, AlternativePlugin, CATEGORIES, Rating, Category, Subcategory, PluginSuggestion, AudioDemo
 from .forms import StaffPluginSubmission, SuggestionForm
 
 import json
@@ -229,14 +229,38 @@ def staff_dashboard(request):
                 image=data.get("image"),
             )
 
+            created_plugin = None
+            is_pro = False
+
             if data["plugin_type"] == "PRO":
                 plugin = ProPlugin.objects.create(**common)
                 plugin.subcategories.set(data["subcategory"])
+                created_plugin = plugin
+                is_pro = True
             else:
                 alt = AlternativePlugin.objects.create(**common)
                 alt.subcategories.set(data["subcategory"])
                 for pro in data.get("link_to_pro_plugins", []):
                     pro.alternatives.add(alt)
+                created_plugin = plugin
+                is_pro = False # pedantic
+
+            for i in range(1, 4):
+                audio_file = data.get(f"audio_demo_{i}")
+                title = data.get(f"demo_title_{i}")
+
+                if audio_file:
+                    demo = AudioDemo(
+                        audio_file=audio_file,
+                        title=title if title else audio_file.name # fallback to filename
+                    )
+                    # Link to the correct parent
+                    if is_pro:
+                        demo.pro_plugin = created_plugin
+                    else:
+                        demo.alt_plugin = created_plugin
+                    
+                    demo.save()
             
             # checking if the comes from a submission
             sid = data.get("suggestion_id")
@@ -251,10 +275,45 @@ def staff_dashboard(request):
     # fetching peding suggestions from the UI
     suggestions = PluginSuggestion.objects.filter(status='PENDING').order_by('date_suggested')
 
+    # fetching pro and alt plugins
+    my_pro_plugins = ProPlugin.objects.filter(submitter=request.user).order_by('-date_released')
+    my_alt_plugins = AlternativePlugin.objects.filter(submitter=request.user).order_by('-date_released')
+
     return render(request, "staff_dashboard.html", {
         "form": form,
-        "suggestions": suggestions
+        "suggestions": suggestions,
+        "my_pro_plugins": my_pro_plugins,
+        "my_alt_plugins": my_alt_plugins,
     })
+
+@user_passes_test(staff_check, login_url="login")
+@require_POST
+def delete_plugin(request):
+    plugin_id = request.POST.get('plugin_id')
+    plugin_type = request.POST.get('plugin_type')
+    
+    if plugin_type == 'PRO':
+        model = ProPlugin
+    elif plugin_type == 'ALT':
+        model = AlternativePlugin
+    else:
+        messages.error(request, "Invalid plugin type.")
+        return redirect("staff_dashboard")
+        
+    plugin = get_object_or_404(model, pk=plugin_id)
+    
+    # security check to ensure they own the plugin
+    # this can be removed if we decide later down the line to allow staff members to delete any plugin
+    if plugin.submitter != request.user and not request.user.is_superuser:
+        messages.error(request, "You can only delete plugins you submitted.")
+        return redirect("staff_dashboard")
+
+    # perform deletion
+    name = plugin.name
+    plugin.delete()
+    messages.success(request, f"Deleted '{name}' successfully.")
+    
+    return redirect("staff_dashboard")
 
 def about(request):
     return render(request, "about.html")
