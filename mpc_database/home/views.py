@@ -8,9 +8,10 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import user_passes_test, login_required
 from django.views.decorators.http import require_POST
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.auth import login
 
 from .models import ProPlugin, AlternativePlugin, CATEGORIES, Rating, Category, Subcategory, PluginSuggestion, AudioDemo
-from .forms import StaffPluginSubmission, SuggestionForm
+from .forms import StaffPluginSubmission, SuggestionForm, CustomUserCreationForm
 
 import json
 
@@ -173,16 +174,42 @@ def rate_plugin(request, plugin_type, plugin_id):
 # user routers
 # ---------
 
+def register(request):
+    if request.method == 'POST':
+        # request.FILES is needed because form handles an avatar upload
+        form = CustomUserCreationForm(request.POST, request.FILES)
+        if form.is_valid():
+            user = form.save()
+            # log the user in immediately
+            login(request, user)
+            messages.success(request, "Registration successful!")
+            return redirect('home') # Redirect to home or dashboard
+    else:
+        form = CustomUserCreationForm()
+    
+    return render(request, 'register.html', {'form': form})
+
 @login_required
 def profile_view(request):
     # handle the form submission
     if request.method == 'POST':
         form = SuggestionForm(request.POST)
         if form.is_valid():
-            suggestion = form.save(commit=False)
-            suggestion.submitter = request.user # attach current user
-            suggestion.save()
-            return redirect('profile') # redirect to same page to clear form
+            # count how many PENDING suggestions this specific user has
+            pending_count = PluginSuggestion.objects.filter(
+                submitter=request.user, 
+                status='PENDING'
+            ).count()
+
+            # if they have 3 or more, stop them.
+            if pending_count >= 3:
+                form.add_error(None, "You have reached the limit of 3 pending suggestions. Please wait for staff approval.")
+            else:
+                # they are under the limit, save as normal
+                suggestion = form.save(commit=False)
+                suggestion.submitter = request.user
+                suggestion.save()
+                return redirect('profile')
     else:
         form = SuggestionForm()
 
@@ -242,7 +269,7 @@ def staff_dashboard(request):
                 alt.subcategories.set(data["subcategory"])
                 for pro in data.get("link_to_pro_plugins", []):
                     pro.alternatives.add(alt)
-                created_plugin = plugin
+                created_plugin = alt 
                 is_pro = False # pedantic
 
             for i in range(1, 4):
