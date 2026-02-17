@@ -142,12 +142,11 @@
     <div class="plugin__view grow bg-white rounded-3xl mr-12">
         <!-- search bar -->
         <div class="plugin__navbar flex flex-col items-center justify-center pt-4 pb-4 px-10">
-            <!-- search form (works with JS and as a normal GET fallback) -->
             <form
                 id="plugin-search-form"
                 method="get"
                 action="{% url 'plugins' %}"
-                class="w-full max-w-md relative"
+                class="w-full max-w-2xl relative flex gap-3" 
             >
                 {# keep current tab & category on non-AJAX submit #}
                 <input type="hidden" name="tab" value="{{ active_tab }}">
@@ -155,39 +154,58 @@
                     <input type="hidden" name="category" value="{{ active_category }}">
                 {% endif %}
 
-                <input
-                    id="plugin-search"
-                    type="text"
-                    name="q"
-                    value="{{ search_query|default:'' }}"
-                    placeholder="Search plugins..."
-                    class="w-full rounded-2xl bg-gray-100 pl-12 pr-4 py-2
-                        text-gray-800 placeholder-gray-400
-                        shadow-sm border border-gray-200
-                        focus:outline-none focus:ring-2 focus:ring-[#004F99] focus:border-transparent
-                        transition duration-200"
-                />
+                <div class="relative grow">
+                    <input
+                        id="plugin-search"
+                        type="text"
+                        name="q"
+                        value="{{ search_query|default:'' }}"
+                        placeholder="Search plugins..."
+                        class="w-full rounded-2xl bg-gray-100 pl-12 pr-4 py-2
+                            text-gray-800 placeholder-gray-400
+                            shadow-sm border border-gray-200
+                            focus:outline-none focus:ring-2 focus:ring-[#004F99] focus:border-transparent
+                            transition duration-200"
+                    />
+                    <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500"
+                        fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1010.5 18a7.5 7.5 0 006.15-3.35z"/>
+                    </svg>
+                </div>
 
-                <!-- icon -->
-                <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500"
-                    fill="none" stroke="currentColor" stroke-width="2"
-                    viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1010.5 18a7.5 7.5 0 006.15-3.35z"/>
-                </svg>
+                <div class="relative min-w-[140px]">
+                    <select 
+                        name="sort" 
+                        id="plugin-sort"
+                        class="w-full appearance-none rounded-2xl bg-gray-100 pl-4 pr-10 py-2
+                            text-gray-800 font-medium cursor-pointer
+                            shadow-sm border border-gray-200
+                            focus:outline-none focus:ring-2 focus:ring-[#004F99] focus:border-transparent
+                            transition duration-200"
+                    >
+                        <option value="newest" {% if current_sort == 'newest' %}selected{% endif %}>Newest</option>
+                        <option value="rating" {% if current_sort == 'rating' %}selected{% endif %}>Top Rated</option>
+                        <option value="name" {% if current_sort == 'name' %}selected{% endif %}>Name (A-Z)</option>
+                        <option value="oldest" {% if current_sort == 'oldest' %}selected{% endif %}>Oldest</option>
+                    </select>
+                    <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 pointer-events-none" 
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </div>
             </form>
         </div>
-        <!-- this will be where the plugins are -->
-        <div class="plugin__plugins flex flex-wrap" id="plugin-list">
+        <div class="plugin__plugins flex flex-wrap content-start p-4 overflow-y-auto" id="plugin-list">
             {% include "partials/plugin_cards.html" %}
         </div>
     </div>
 </div>
 
 <script>
-// ajax querying
 document.addEventListener('DOMContentLoaded', function () {
     const searchInput = document.getElementById('plugin-search');
+    const sortSelect  = document.getElementById('plugin-sort'); // New Reference
     const pluginList  = document.getElementById('plugin-list');
     const searchForm  = document.getElementById('plugin-search-form');
 
@@ -199,25 +217,27 @@ document.addEventListener('DOMContentLoaded', function () {
         // build URL with current query params
         const url = new URL(window.location.href);
 
+        // Handle Search
         if (query) {
             url.searchParams.set('q', query);
         } else {
             url.searchParams.delete('q');
         }
 
-        // fetch to get HTML
-        // this is partial
+        // handle sort / select
+        if (sortSelect && sortSelect.value) {
+            url.searchParams.set('sort', sortSelect.value);
+        }
+
+        // fetch
         fetch(url.toString(), {
             headers: {
-                'X-Requested-With': 'XMLHttpRequest' // so view knows it's AJAX
+                'X-Requested-With': 'XMLHttpRequest'
             }
         })
         .then(response => response.text())
         .then(html => {
-            // replace the plugin cards container with new HTML
             pluginList.innerHTML = html;
-
-            // update URL in address bar without reloading
             window.history.replaceState({}, '', url);
         })
         .catch(err => {
@@ -225,16 +245,24 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // live search with debounce
+    // search listener 
     searchInput.addEventListener('input', function (e) {
         const query = e.target.value;
         clearTimeout(debounceTimeout);
         debounceTimeout = setTimeout(() => {
             fetchPlugins(query);
-        }, 250); // delay is adjustable
+        }, 250);
     });
 
-    // prevent full form submit; use AJAX instead
+    // sort listener 
+    if (sortSelect) {
+        sortSelect.addEventListener('change', function() {
+            // no debounce for dropdown
+            fetchPlugins(searchInput.value);
+        });
+    }
+
+    // form submit listener
     if (searchForm) {
         searchForm.addEventListener('submit', function (e) {
             e.preventDefault();

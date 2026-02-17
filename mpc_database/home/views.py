@@ -25,6 +25,9 @@ def plugins(request):
     tab = request.GET.get("tab", "pro")
     search_query = (request.GET.get("q") or "").strip()
 
+    # defaulting to newest here
+    sort_by = request.GET.get("sort", "newest")
+
     # filter by slug field
     active_category = request.GET.get('category')
     categories = Category.objects.prefetch_related('subcategories').all()
@@ -57,6 +60,17 @@ def plugins(request):
                 plugins_qs = plugins_qs.filter(
                     subcategories__slug=active_category
                 ).distinct()
+
+    # applying search filter
+    if sort_by == "rating":
+        # sort by rating descending, then name
+        plugins_qs = plugins_qs.order_by("-rating", "name")
+    elif sort_by == "oldest":
+        plugins_qs = plugins_qs.order_by("date_released")
+    elif sort_by == "name":
+        plugins_qs = plugins_qs.order_by("name")
+    else:
+        plugins_qs = plugins_qs.order_by("-date_released")
 
 
     # apply search filter if there's a query
