@@ -1,13 +1,41 @@
 # home/forms.py
 from django import forms
-from django.contrib.auth.forms import AdminUserCreationForm, UserChangeForm, AuthenticationForm
+from django.contrib.auth.forms import AdminUserCreationForm, UserChangeForm, AuthenticationForm, UserCreationForm
 from django.core.validators import FileExtensionValidator
 from .models import CustomUser, Category, ProPlugin, Subcategory, PluginSuggestion, validate_audio_size
 
-class CustomUserCreationForm(AdminUserCreationForm):
+class CustomUserCreationForm(UserCreationForm):
     class Meta:
         model = CustomUser
         fields = ("username", "email", "avatar")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # tailwind stlying 
+        base_style = (
+            "block w-full rounded-xl border border-slate-300 bg-white px-3 py-2 "
+            "text-slate-900 placeholder-slate-400 shadow-sm "
+            "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        )
+
+        for name, field in self.fields.items():
+            # apply base style to all fields
+            field.widget.attrs.update({'class': base_style})
+            
+            # specific tweak for the file input (avatar)
+            if name == 'avatar':
+                field.widget.attrs.update({
+                    "class": (
+                        "block w-full text-sm text-slate-700 "
+                        "file:mr-4 file:rounded-xl file:border-0 "
+                        "file:bg-blue-600 file:px-4 file:py-2 file:text-white file:font-semibold "
+                        "hover:file:bg-blue-500"
+                    )
+                })
+
+# hmm... 
+
 
 class CustomUserChangeForm(UserChangeForm):
     class Meta:

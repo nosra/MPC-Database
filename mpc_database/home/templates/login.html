@@ -33,6 +33,10 @@
     <button type="submit" class="w-full bg-[#004F99] text-white py-2 rounded-lg font-semibold border hover:bg-blue-500">
       Log in
     </button>
-  </form> 
+  </form>
 </div>
+<p class="mt-4 text-sm text-center text-white">
+  Don't have an account? 
+  <a href="{% url 'register' %}" class="text-yellow-500 hover:underline font-semibold">Sign up</a>
+</p>
 {% endblock %}

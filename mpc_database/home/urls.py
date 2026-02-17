@@ -15,6 +15,7 @@ urlpatterns = [
     path("profile/", views.profile_view, name="profile"), 
     path("about/", views.about, name="about"),
     path('ajax/search/', views.search_plugins, name='ajax_search'),
+    path("register/", views.register, name="register"),
     path('rate/<str:plugin_type>/<int:plugin_id>/', views.rate_plugin, name='rate_plugin'),
 ]
 
