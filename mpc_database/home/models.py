@@ -7,7 +7,6 @@ from django.core.exceptions import ValidationError
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Avg
-from PIL import Image
 
 # -----------------------
 # USERS
@@ -131,7 +130,7 @@ class AlternativePlugin(models.Model, RatingMixin):
     # fallback for no image
     @property
     def image_url(self):
-        if self.image and default_storage.exists(self.image.name):
+        if self.image:
             return self.image.url
         # fallback to static default
         return static("plugins/default-plugin.jpg")
@@ -164,7 +163,7 @@ class ProPlugin(models.Model, RatingMixin):
     # fallback for no image
     @property
     def image_url(self):
-        if self.image and default_storage.exists(self.image.name):
+        if self.image:
             return self.image.url
         # fallback to static default
         return static("plugins/default-plugin.jpg")
