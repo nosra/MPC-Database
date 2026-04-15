@@ -1,2 +1,0 @@
-[providers]
-dependsOn = ['python', 'node']
