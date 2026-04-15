@@ -357,9 +357,17 @@
                                         {% endfor %}
                                         • Released {{ alt.date_released|date:"Y" }}
                                     </p>
-                                    <p class="text-xs text-emerald-600 font-semibold mb-2">
-                                        Free alternative
-                                    </p>
+                                    <div class="mb-2">
+                                    {% if alt.price == 0 or not alt.price %}
+                                        <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">
+                                            Free Alternative
+                                        </span>
+                                    {% else %}
+                                        <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                                            ${{ alt.price }} Alternative
+                                        </span>
+                                    {% endif %}
+                                    </div>  
                                     <p class="text-xs text-slate-600 line-clamp-3">
                                         {{ alt.description }}
                                     </p>
