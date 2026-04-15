@@ -14,6 +14,7 @@ from pathlib import Path
 import subprocess
 import os
 import dj_database_url
+import cloudinary
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -45,6 +46,8 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'cloudinary',
+    'cloudinary_storage',
     'django.contrib.staticfiles',
     'home',
     'tailwind',
@@ -123,6 +126,13 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# setting up cloudinary storage
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
+}
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
