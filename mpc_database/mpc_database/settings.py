@@ -142,7 +142,7 @@ STORAGES = {
     },
 }
 # Internationalization
-# https://docs.djangoproject.com/en/5.2/topics/i18n/
+# https://docs.djangoproject.com/en/5.2/topics/i19n/
 
 LANGUAGE_CODE = 'en-us'
 
