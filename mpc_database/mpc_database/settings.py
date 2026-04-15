@@ -46,8 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'cloudinary',
-    'cloudinary_storage',
+    'cloudinary', 
     'django.contrib.staticfiles',
     'home',
     'tailwind',
@@ -135,7 +134,7 @@ CLOUDINARY_STORAGE = {
 }
 STORAGES = {
     "default": {
-        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+        "BACKEND": "home.storage.CloudinaryStorage",
     },
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
