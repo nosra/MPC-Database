@@ -7,6 +7,7 @@ from django.core.exceptions import ValidationError
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Avg
+from PIL import Image
 
 # -----------------------
 # USERS
@@ -139,6 +140,22 @@ class AlternativePlugin(models.Model, RatingMixin):
     @property
     def categories(self):
         return Category.objects.filter(subcategories__in=self.subcategories.all()).distinct()
+    
+    # overloading the image function to compress images before saving
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        if self.image:
+            img = Image.open(self.image.path)
+
+            if img.height > 800 or img.width > 800:
+                output_size = (800, 800)
+                img.thumbnail(output_size, Image.Resampling.LANCZOS)
+                
+                # overwriting the original large file with the compressed one
+                # quality=85 seems to be a good balance
+                img.save(self.image.path, optimize=True, quality=85)
+
 
 class ProPlugin(models.Model, RatingMixin):
     submitter = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True)
@@ -173,6 +190,22 @@ class ProPlugin(models.Model, RatingMixin):
     
    # mtm with pro plugin
     alternatives = models.ManyToManyField(AlternativePlugin, related_name="pro_plugins", blank=True)
+
+    # overloading the image function to compress images before saving
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        if self.image:
+            img = Image.open(self.image.path)
+
+            if img.height > 800 or img.width > 800:
+                output_size = (800, 800)
+                img.thumbnail(output_size, Image.Resampling.LANCZOS)
+                
+                # overwriting the original large file with the compressed one
+                # quality=85 seems to be a good balance
+                img.save(self.image.path, optimize=True, quality=85)
+
 
     def __str__(self):
         return self.name
