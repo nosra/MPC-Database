@@ -12,19 +12,8 @@
 
         <!-- hero banner -->
         <div class="relative h-80 md:h-96">
-            {% if plugin.image %}
-                <img
-                    src="{{ plugin.image.url }}"
-                    class="absolute inset-0 w-full h-full object-cover"
-                    alt="{{ plugin.name }}"
-                />
-            {% else %}
-                <img
-                    src="{% static 'plugins/default-plugin.png' %}"
-                    class="absolute inset-0 w-full h-full object-cover"
-                    alt="{{ plugin.name }}"
-                />
-            {% endif %}
+            <!-- models.py already handles a no image fallback-->
+            <img src="{{ plugin.image_url }}" class="absolute inset-0 w-full h-full object-cover" alt="{{ plugin.name }}" />
 
             <!-- dark/blur overlay -->
             <div class="absolute inset-0 bg-black/50">
