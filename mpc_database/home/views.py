@@ -101,6 +101,9 @@ def plugins(request):
 
 def plugin_detail(request, pk):
     plugin = get_object_or_404(ProPlugin, pk=pk)
+
+    content_type = ContentType.objects.get_for_model(plugin)
+    ratings = Rating.objects.filter(content_type=content_type, object_id=plugin.id)
     
     # check if user has already rated this
     user_rating = 0
@@ -116,6 +119,7 @@ def plugin_detail(request, pk):
     context = {
         "plugin": plugin,
         "user_rating": user_rating,
+        "rating_count": ratings.count(),
         "plugin_type": "pro" # helper for the JS fetch URL
     }
     return render(request, "plugin_detail.html", context)
@@ -123,6 +127,9 @@ def plugin_detail(request, pk):
 
 def alt_plugin_detail(request, pk):
     plugin = get_object_or_404(AlternativePlugin, pk=pk)
+
+    content_type = ContentType.objects.get_for_model(plugin)
+    ratings = Rating.objects.filter(content_type=content_type, object_id=plugin.id)
 
     # check if user has already rated this
     user_rating = 0
@@ -138,6 +145,7 @@ def alt_plugin_detail(request, pk):
     context = {
         "plugin": plugin,
         "user_rating": user_rating,
+        "rating_count": ratings.count(),
         "plugin_type": "alt" 
     }
     return render(request, 'alt_plugin_detail.html', context)
