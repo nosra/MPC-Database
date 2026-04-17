@@ -94,7 +94,8 @@
                             
                             <div class="rating rating-lg rating-half" id="star-container"
                                 data-plugin-type="{% if plugin.alternatives %}pro{% else %}alt{% endif %}" 
-                                data-plugin-id="{{ plugin.id }}">
+                                data-plugin-id="{{ plugin.id }}"
+                                data-user-rating="{{ user_rating}}">
                                 
                                 <input type="radio" name="rating-10" class="rating-hidden" />
 
@@ -120,9 +121,14 @@
                                 {% endwith %}
                             </div>
 
-                            <span class="text-lg font-bold text-white" id="rating-text">
-                                {{ plugin.rating|stringformat:".1f" }}
-                            </span>
+                            <div class="flex flex-col">
+                                <span class="text-lg font-bold text-white" id="rating-text">
+                                    {{ plugin.rating|stringformat:".1f" }}
+                                </span>
+                                <span class="text-xs text-gray-400" id="rating-count">
+                                    {{ rating_count }} rating{{ rating_count|pluralize }}
+                                </span>
+                            </div>
                         </div>
 
                         <span class="text-xs text-gray-300">
@@ -179,14 +185,20 @@
                             })
                             .then(data => {
                                 if (data.success) {
-                                    // updating the averaage display 
                                     ratingText.innerText = parseFloat(data.new_average).toFixed(1);
-                                    
-                                    // updated "you rated" text if it exists
-                                    if(userScoreText) {
+
+                                    // increment count display if this is a new rating
+                                    const countEl = document.getElementById("rating-count");
+                                    const existingRating = parseFloat(container.dataset.userRating) || 0;
+                                    if (countEl && existingRating === 0) {
+                                        const current = parseInt(countEl.innerText);
+                                        countEl.innerText = (current + 1) + " rating" + (current + 1 === 1 ? "" : "s");
+                                        container.dataset.userRating = score;
+                                    }
+
+                                    if (userScoreText) {
                                         userScoreText.innerText = score;
                                     } else {
-                                        // if the text was "Click stars to rate", change it
                                         const statusSpan = container.parentElement.querySelector(".text-gray-300");
                                         statusSpan.innerHTML = `You rated: <span id="user-score">${score}</span>`;
                                     }
