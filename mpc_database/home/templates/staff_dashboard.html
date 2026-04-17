@@ -276,12 +276,19 @@
                                 {{ p.date_released }}
                             </td>
                             <td class="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-                                <form action="{% url 'delete_plugin' %}" method="POST" onsubmit="return confirm('Are you sure you want to delete {{ p.name }}? This cannot be undone.');">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="plugin_id" value="{{ p.id }}">
-                                    <input type="hidden" name="plugin_type" value="PRO">
-                                    <button type="submit" class="text-red-600 hover:text-red-900 font-semibold">Delete</button>
-                                </form>
+                                <div class="flex items-center justify-end gap-4">
+                                    <a href="{% url 'edit_plugin' 'PRO' p.id %}"  {# change to 'ALT' in the alt loop #}
+                                    class="text-blue-600 hover:text-blue-900 font-semibold">
+                                        Edit
+                                    </a>
+                                    <form action="{% url 'delete_plugin' %}" method="POST"
+                                        onsubmit="return confirm('Are you sure you want to delete {{ p.name }}?');">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="plugin_id" value="{{ p.id }}">
+                                        <input type="hidden" name="plugin_type" value="PRO"> {# ALT in the other loop #}
+                                        <button type="submit" class="text-red-600 hover:text-red-900 font-semibold">Delete</button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                         {% endfor %}
@@ -305,12 +312,19 @@
                                 {{ p.date_released }}
                             </td>
                             <td class="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-                                <form action="{% url 'delete_plugin' %}" method="POST" onsubmit="return confirm('Are you sure you want to delete {{ p.name }}? This cannot be undone.');">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="plugin_id" value="{{ p.id }}">
-                                    <input type="hidden" name="plugin_type" value="ALT">
-                                    <button type="submit" class="text-red-600 hover:text-red-900 font-semibold">Delete</button>
-                                </form>
+                                <div class="flex items-center justify-end gap-4">
+                                    <a href="{% url 'edit_plugin' 'PRO' p.id %}"  {# change to 'ALT' in the alt loop #}
+                                    class="text-blue-600 hover:text-blue-900 font-semibold">
+                                        Edit
+                                    </a>
+                                    <form action="{% url 'delete_plugin' %}" method="POST"
+                                        onsubmit="return confirm('Are you sure you want to delete {{ p.name }}?');">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="plugin_id" value="{{ p.id }}">
+                                        <input type="hidden" name="plugin_type" value="PRO"> {# ALT in the other loop #}
+                                        <button type="submit" class="text-red-600 hover:text-red-900 font-semibold">Delete</button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                         {% endfor %}
