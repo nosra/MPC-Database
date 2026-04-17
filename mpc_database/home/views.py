@@ -9,6 +9,7 @@ from django.contrib.auth.decorators import user_passes_test, login_required
 from django.views.decorators.http import require_POST
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth import login
+from .cloudinary_utils import delete_cloudinary_file
 
 from .models import ProPlugin, AlternativePlugin, CATEGORIES, Rating, Category, Subcategory, PluginSuggestion, AudioDemo
 from .forms import StaffPluginSubmission, SuggestionForm, CustomUserCreationForm
@@ -191,6 +192,108 @@ def rate_plugin(request, plugin_type, plugin_id):
     
     return JsonResponse({'success': True, 'new_average': plugin.rating})
 
+def staff_check(user):
+    return user.is_authenticated and user.is_staff
+
+# this is industrial...
+@user_passes_test(staff_check, login_url="login")
+def edit_plugin(request, plugin_type, plugin_id):
+    if plugin_type == "PRO":
+        plugin = get_object_or_404(ProPlugin, pk=plugin_id)
+    elif plugin_type == "ALT":
+        plugin = get_object_or_404(AlternativePlugin, pk=plugin_id)
+    else:
+        messages.error(request, "Invalid plugin type")
+        return redirect("staff_dashboard")
+    
+    existing_demos = plugin.audio_demos.all()
+    # update if we send a POST. we prepopulate data otherwise
+    if request.method == "POST":
+        form = StaffPluginSubmission(request.POST, request.FILES)
+        if(form.is_valid()):
+            data = form.cleaned_data
+
+            # update scalar fields
+            plugin.name = data["plugin_name"]
+            plugin.date_released = data["date_released"]
+            plugin.price = data["price"]
+            plugin.description = data["description"]
+            plugin.size = data["size"]
+            plugin.download_link = data["download_link"]
+
+            # only replace if a new plugin was uploaded
+            if data.get("image") and plugin.image:
+                delete_cloudinary_file(plugin.image.name, default_resource_type="image")
+            if data.get("image"):
+                plugin.image = data["image"]
+            
+            plugin.save()
+            plugin.subcategories.set(data["subcategory"])
+
+            # have to update which ALT plugins point to this one
+            if plugin_type == "ALT":
+                # remove this alt from every pro plugin that currently links to it
+                for pro in ProPlugin.objects.filter(alternatives=plugin):
+                    pro.alternatives.remove(plugin)
+                # re-add only the ones the staff member selected
+                for pro in data.get("link_to_pro_plugins", []):
+                    pro.alternatives.add(plugin)
+            
+            # handle audio demos
+            # we have to 1.) delete old ones and 2.) save new ones
+            for i in range(1, 4):
+                audio_file = data.get(f"audio_demo_{i}")
+                title = data.get(f"demo_title_{i}", "")
+
+                if audio_file:
+                    # replace the i-th existing demo if it exists, else create
+                    demo_list = list(existing_demos)
+                    if i - 1 < len(demo_list):
+                        demo = demo_list[i - 1]
+                        delete_cloudinary_file(demo.audio_file.name, default_resource_type="video")
+                        demo.audio_file = audio_file
+                        demo.title = title or audio_file.name
+                        demo.save()
+                    else:
+                        demo = AudioDemo(audio_file=audio_file, title=title or audio_file.name)
+                        if plugin_type == "PRO":
+                            demo.pro_plugin = plugin
+                        else:
+                            demo.alt_plugin = plugin
+                        demo.save()
+            messages.success(request, f"'{plugin.name}' updated successfully.")
+            if plugin_type == "PRO":
+                return redirect("plugin_detail", pk=plugin.pk)
+            else:
+                return redirect("alt_plugin_detail", pk=plugin.pk)
+    else:
+        # pre-populate the form with existing data
+        initial = {
+            "plugin_type": plugin_type,
+            "plugin_name": plugin.name,
+            "date_released": plugin.date_released,
+            "price": plugin.price,
+            "description": plugin.description,
+            "size": plugin.size,
+            "download_link": plugin.download_link,
+            "subcategory": plugin.subcategories.all(),
+        }
+        if plugin_type == "ALT":
+            initial["link_to_pro_plugins"] = ProPlugin.objects.filter(alternatives=plugin)
+
+        # pre-fill audio demo titles (files can't be pre-filled by browsers)
+        for i, demo in enumerate(existing_demos[:3], start=1):
+            initial[f"demo_title_{i}"] = demo.title
+
+        form = StaffPluginSubmission(initial=initial)
+    # render the new template
+    return render(request, "edit_plugin.html", {
+        "form": form,
+        "plugin": plugin,
+        "plugin_type": plugin_type,
+        "existing_demos": existing_demos,
+    })
+
 
 # ---------
 # user routers
@@ -208,7 +311,7 @@ def register(request):
             return redirect('home') # Redirect to home or dashboard
     else:
         form = CustomUserCreationForm()
-    
+
     return render(request, 'register.html', {'form': form})
 
 @login_required
@@ -249,9 +352,6 @@ def profile_view(request):
 # ---------
 # submissions routers
 # ---------
-def staff_check(user):
-    return user.is_authenticated and user.is_staff
-
 @user_passes_test(staff_check, login_url="login")
 def staff_dashboard(request):
     # handling rejecting a plugin
