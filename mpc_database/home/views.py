@@ -16,8 +16,19 @@ from .forms import StaffPluginSubmission, SuggestionForm, CustomUserCreationForm
 
 import json
 
+# making the home page feel more alive 
 def home(request):
-    return render(request, 'home.html')
+    recent_pro = ProPlugin.objects.order_by('-date_released')[:6]
+    recent_alt = AlternativePlugin.objects.order_by('-date_released')[:6]
+    top_rated_pro = ProPlugin.objects.filter(rating__gt=0).order_by('-rating')[:6]
+    top_rated_alt = AlternativePlugin.objects.filter(rating__gt=0).order_by('-rating')[:6]
+
+    return render(request, 'home.html', {
+        'recent_pro': recent_pro,
+        'recent_alt': recent_alt,
+        'top_rated_pro': top_rated_pro,
+        'top_rated_alt': top_rated_alt,
+    })
 # ---------
 # plugins routers
 # ---------
