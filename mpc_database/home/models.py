@@ -213,6 +213,7 @@ class AudioDemo(models.Model):
     alt_plugin = models.ForeignKey(
         "AlternativePlugin",
         on_delete = models.CASCADE,
+        related_name = "audio_demos",
         null=True,
         blank=True,
     )
